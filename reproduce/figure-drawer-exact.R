@@ -133,7 +133,7 @@ library(mise)
 # df.result = read.csv('doubleeffect-200608-2300-D15-50-summary.csv'); Dtitle = 'Double D15'
 
 mise()
-ylimits = c(0,0.5)
+ylimits = c(0,0.1)
 # df.result = read.csv('napkin-200609-1500-D15-50-summary.csv'); Dtitle = 'Napkin D15'
 # df.result = read.csv('mediator-200609-2100-D15-50-summary.csv'); Dtitle = 'Mediator D15'
 # df.result = read.csv('doubleeffect-200609-2100-D15-50-summary.csv'); Dtitle = 'Double D15'
@@ -165,34 +165,34 @@ medianTF = T
 gg = ggplot(data = df.result, aes(x=Nlist))
 
 if(medianTF == T){
-  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.multi.50,colour="Y.multi.50"),size=1,method=regmethod,se=F, span=spanval)  
-  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.naive.50,colour="Y.naive.50"),size=1.5,method=regmethod,se=F, span=spanval,linetype='dashed')
-  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.exact.50,colour="Y.exact.50"),size=2,method=regmethod,se=F, span=spanval,linetype='dotdash')
-  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.id.50,colour="Y.id.50"),size=3,method=regmethod,se=F, span=spanval,linetype='dotted')
+  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.global.50,colour="Y.global.50"),size=1,method=regmethod,se=F, span=spanval)  
+  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.plugin.50"),size=1.5,method=regmethod,se=F, span=spanval,linetype='dashed')
+  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.heuristic.50,colour="Y.heuristic.50"),size=2,method=regmethod,se=F, span=spanval,linetype='dotdash')
+  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.id.50,colour="Y.id.50"),size=3,method=regmethod,se=F, span=spanval,linetype='dotted')
   # gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.multi.25,ymax=Y.multi.75),alpha=0.2, fill="red")
   # gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.naive.25,ymax=Y.naive.75),alpha=0.1, fill="blue")
   # gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.exact.25,ymax=Y.exact.75),alpha=0.2, fill="seagreen")
-  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.naive.50,colour="Y.naive.50"),size=1.5,method='gam',se=F,formula=y~s(x,k=10),)
-  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.naive.50,colour='Y.naive.50'),size=point_size,alpha=alpha_point,shape=4)
-  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.multi.50,colour='Y.multi.50'),size=point_size,alpha=alpha_point,shape=16)
-  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.exact.50,colour='Y.exact.50'),size=point_size,alpha=alpha_point,shape=8)
-  # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.id.50,colour='Y.id.50'),size=point_size,alpha=alpha_point,shape=9)
+  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.plugin.50"),size=1.5,method='gam',se=F,formula=y~s(x,k=10),)
+  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.plugin.50,colour='Y.plugin.50'),size=point_size,alpha=alpha_point,shape=4)
+  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.global.50,colour='Y.global.50'),size=point_size,alpha=alpha_point,shape=16)
+  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.heuristic.50,colour='Y.heuristic.50'),size=point_size,alpha=alpha_point,shape=8)
+  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.id.50,colour='Y.id.50'),size=point_size,alpha=alpha_point,shape=9)
   if(twoD == F){
     gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.scale.50,colour="Y.scale.50"),size=1.5,method=regmethod,se=F,span=spanval)
-    gg = gg + scale_color_manual("",breaks=c("Y.multi.50","Y.naive.50","Y.scale.50"),values = c("gold", "red","seagreen"),labels=c("CWO","Naive","Weight-HD"))
+    gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.scale.50"),values = c("gold", "red","seagreen"),labels=c("CWO","Naive","Weight-HD"))
     # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.scale.50,colour='Y.scale.50'),size=1.5,alpha=0.2)
   }else{
-    gg = gg + scale_color_manual("",breaks=c("Y.multi.50","Y.naive.50","Y.exact.50"),values = c("blue", "firebrick2","orange"),labels=c("WERM-ID-R","Plug-in","WERM-ID"))
-    # gg = gg + scale_color_manual("",breaks=c("Y.multi.50","Y.naive.50","Y.exact.50","Y.id.50"),values = c("blue", "firebrick2","orange","darkgreen"),labels=c("WERM-ID-R-Global","Plug-in","WERM-ID-R-Heuristic","WERM-ID"))   
+    gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.heuristic.50","Y.id.50"),values = c("blue", "firebrick2","orange","purple"),labels=c("WERM-Global","Plug-In","WERM-ID-R","WERM-ID"))
+    # gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.heuristic.50","Y.id.50"),values = c("blue", "firebrick2","orange","darkgreen"),labels=c("WERM-ID-R-Global","Plug-in","WERM-ID-R-Heuristic","WERM-ID"))   
   }
-  # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.multi.50,colour='Y.multi.50'),size=1.5,alpha=0.2)
-  # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.naive.50,colour='Y.naive.50'),size=1.5,alpha=0.2)
+  # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.global.50,colour='Y.global.50'),size=1.5,alpha=0.2)
+  # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.plugin.50,colour='Y.plugin.50'),size=1.5,alpha=0.2)
 }else{
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.multi.mean,colour="Y.multi.mean"),size=1.5,method=regmethod,se=F, span=spanval)
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.naive.mean,colour="Y.naive.mean"),size=1.5,method=regmethod,se=F, span=spanval)
   gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.multi.25,ymax=Y.multi.75),alpha=0.25, fill="blue")
   gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.naive.25,ymax=Y.naive.75),alpha=0.25, fill="red")
-  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.naive.50,colour="Y.naive.mean"),size=1.5,method='lm',se=F,formula=y~splines::bs(x,5),span=spanval)
+  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.naive.mean"),size=1.5,method='lm',se=F,formula=y~splines::bs(x,5),span=spanval)
   # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.multi.mean,colour='Y.multi.mean'),size=1.5,alpha=0.2)
   # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.naive.mean,colour='Y.naive.mean'),size=1.5,alpha=0.2)
   if(twoD == F){
