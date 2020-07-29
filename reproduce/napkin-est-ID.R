@@ -278,23 +278,10 @@ multiID = function(OBS,D,numCate){
   ################################
   # Importance sampling based 
   SW_importance_sampling  = ComputeSW.lowhigh(Z,W,'Z')
-  # Re-learn with the regularization
-  # regval = ((max(SW_importance_sampling) - min(SW_importance_sampling))**1)/sqrt(nrow(OBS))
-  # model_SW = xgboost(verbose = 0, data = data.matrix(data.frame(W,Z)), label = SW_importance_sampling, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
   learned_W = SW_importance_sampling
-  
-  ################################
-  # Predict Pw(y | x)
-  ################################
-  xgbMatrix = xgb.DMatrix(data.matrix(data.frame(X,Z)), label=Y)
-  # regval = 0
-  # regval = 1/sqrt(nrow(OBS))
-  regval = 0 
-  modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=0,alpha=0,objective = "binary:logistic",weight = learned_W)
-  
-  Yx0 = mean(predict(modelY_xgboost,newdata=data.matrix(rep(0,nrow(DATA))),type='response'))
-  Yx1 = mean(predict(modelY_xgboost,newdata=data.matrix(rep(1,nrow(DATA))),type='response'))
-  
+  lambda_h = rep(0,nrow(OBS))
+  Yx0 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(0,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)
+  Yx1 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(1,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)
   myans = c(Yx0,Yx1)
   
   return(myans)

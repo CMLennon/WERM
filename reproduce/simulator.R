@@ -14,10 +14,11 @@ library(arm)
 library(mgcv)
 library(mise)
 
+# Log Example
+## Rscript simulator.R 'napkin' 5 2 5 20 1 20 4 50 'napkin_temp'
 
 args = commandArgs(trailingOnly = TRUE)
 cores = detectCores()
-
 
 probleminstance = args[1]
 D = as.numeric(args[2])
@@ -31,16 +32,16 @@ NumUnit = as.numeric(args[9])
 filetitle = args[10]
 
 # Example 
-probleminstance = 'napkin'
-D = 5 
-numCate = 2 
-simRound = 5 
-totalN = 20 
-nidx.start = 1
-nidx.end = totalN
-corenum = 4 
-NumUnit = 50 
-filetitle = 'napkin_temp'
+# probleminstance = 'napkin'
+# D = 5 
+# numCate = 2 
+# simRound = 5 
+# totalN = 20 
+# nidx.start = 1
+# nidx.end = totalN
+# corenum = 4 
+# NumUnit = 50 
+# filetitle = 'napkin_temp'
 # 
 
 Nintv = 10^7
@@ -107,33 +108,35 @@ for (nidx in nidx.start:nidx.end){
                           mytmp = dataGen(seednum,N,Nintv,D,C)
                           OBS = mytmp[[1]]
                           INTV = mytmp[[2]]
-                          naiveanswer = paramAdj(OBS,D,numCate)
-                          multianswer = multiGlobal(OBS,D,numCate)
-                          exactanswer = multiHeuristic(OBS,D,numCate)
-                          idanswer = multiID(OBS,D,numCate)
+                          PLUGINanswer = paramAdj(OBS,D,numCate)
+                          GLOBALanswer = multiGlobal(OBS,D,numCate)
+                          HEURISTICanswer = multiHeuristic(OBS,D,numCate)
+                          IDanswer = multiID(OBS,D,numCate)
                           answer = c(mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==1),'Y.intv']),
                                      mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==1),'Y.intv']))
-                          naiveperformance = mean(abs(answer-naiveanswer),na.rm=T)
-                          multiperformance = mean(abs(answer-multianswer),na.rm=T)
-                          exactperformance = mean(abs(answer-exactanswer),na.rm=T)
-                          idperformance = mean(abs(answer-idanswer),na.rm=T)
+                          PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
+                          GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
+                          HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
+                          IDperformance = mean(abs(answer-IDanswer),na.rm=T)
                         }else{
                           seednum = sample(1:1000000,1)
                           tmp = dataGen(seednum,N,Nintv,D,C)
                           OBS = tmp[[1]]
                           INTV = tmp[[2]]
-                          naiveanswer = paramAdj(OBS,D,numCate)
-                          multianswer = multiGlobal(OBS,D,numCate)
-                          exactanswer = multiHeuristic(OBS,D,numCate)
-                          idanswer = multiID(OBS,D,numCate)
                           answer = c(mean(INTV[INTV$X.intv==0,'Y.intv']),mean(INTV[INTV$X.intv==1,'Y.intv']))  
-                          naiveperformance = mean(abs(answer-naiveanswer),na.rm=T)
-                          multiperformance = mean(abs(answer-multianswer),na.rm=T)
-                          exactperformance = mean(abs(answer-exactanswer),na.rm=T)
-                          idperformance = mean(abs(answer-idanswer),na.rm=T)
+                          
+                          PLUGINanswer = PlugInEstimator(OBS,D,numCate)
+                          GLOBALanswer = multiGlobal(OBS,D,numCate)
+                          HEURISTICanswer = multiHeuristic(OBS,D,numCate)
+                          IDanswer = multiID(OBS,D,numCate)
+                          
+                          PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
+                          GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
+                          HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
+                          IDperformance = mean(abs(answer-IDanswer),na.rm=T)
                         }
                         answerperformance = 0 
-                        return(c(answerperformance,naiveperformance,multiperformance,exactperformance,idperformance))
+                        return(c(answerperformance,PLUGINperformance,GLOBALperformance,HEURISTICperformance,IDperformance))
                       }
   close(pb)
   
@@ -180,16 +183,16 @@ conflist = c(5,25,50,75,95,'mean')
 for (idx in 1:length(conflist)){
   confval = conflist[idx]
   assign(paste('Y.intv.',confval,sep=""),mat.intv[,idx])
-  assign(paste('Y.multi.',confval,sep=""),mat.global[,idx])
-  assign(paste('Y.naive.',confval,sep=""),mat.naive[,idx])
-  assign(paste('Y.exact.',confval,sep=""),mat.heuristic[,idx])
+  assign(paste('Y.global.',confval,sep=""),mat.global[,idx])
+  assign(paste('Y.plugin.',confval,sep=""),mat.naive[,idx])
+  assign(paste('Y.heuristic.',confval,sep=""),mat.heuristic[,idx])
   assign(paste('Y.id.',confval,sep=""),mat.id[,idx])
 }
 
 df.result = data.frame(Nlist, Y.intv.5,Y.intv.25,Y.intv.50,Y.intv.75,Y.intv.95,Y.intv.mean,
-                       Y.multi.5,Y.multi.25,Y.multi.50,Y.multi.75,Y.multi.95,Y.multi.mean, # Global
-                       Y.naive.5,Y.naive.25,Y.naive.50,Y.naive.75,Y.naive.95,Y.naive.mean, # Plugin 
-                       Y.exact.5,Y.exact.25,Y.exact.50,Y.exact.75,Y.exact.95,Y.exact.mean, # Heuristic 
+                       Y.global.5,Y.global.25,Y.global.50,Y.global.75,Y.global.95,Y.global.mean, # Global
+                       Y.plugin.5,Y.plugin.25,Y.plugin.50,Y.plugin.75,Y.plugin.95,Y.plugin.mean, # Plugin 
+                       Y.heuristic.5,Y.heuristic.25,Y.heuristic.50,Y.heuristic.75,Y.heuristic.95,Y.heuristic.mean, # Heuristic 
                        Y.id.5,Y.id.25,Y.id.50,Y.id.75,Y.id.95,Y.id.mean # WERM-ID
 )
 write.csv(df.result,paste(filetitle,"-summary.csv",sep=""))

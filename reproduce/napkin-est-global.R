@@ -6,7 +6,7 @@ napkin_lossfun = function(pred.loss, weightval, weightlabel,lambda_W){
 }
 
 napkin_gradfun = function(pred.loss, weightval, weightlabel,lambda_W){
-  LW = sqrt(mean((weightval - weightlabel)^2 + lambda_W * weightval^2 ))
+  LW = sqrt(mean((weightval - weightlabel)^2 + lambda_W * weightval^2 )) + 1e-4
   return(mean(pred.loss) + (1/sqrt(LW))*((1+lambda_W)*weightval - weightlabel)/length(weightlabel))
 }
 
@@ -33,18 +33,20 @@ multiGlobal = function(OBS,D,numCate){
   # Re-learn with the regularization
   # regvallist = c(1:100)*(nrow(OBS))/20
   regvallist = seq(0,10,by=0.2)
-  lambda_W = learnHyperParam(regvallist,data.matrix(data.frame(W=W,Z=Z)),SW_importance_sampling,0)/nrow(OBS)
-  lambda_W = lambda_W/nrow(OBS)
+  lambda_W = learnHyperParam(regvallist,data.matrix(data.frame(W=W,Z=Z)),SW_importance_sampling,0)
+  # lambda_W = lambda_W/nrow(OBS)
   learned_W = learnWdash(SW_importance_sampling,data.matrix(data.frame(W=W,Z=Z)),lambda_W)
   
-  orig_W = learned_W
+  if (sd(learned_W) == 0){
+    learned_W = learned_W + rnorm(n=length(learned_W),mean = 0, sd=1e-2)
+  }
   
   ################################
   # Predict Pw(y | x)
   ################################
   ##### OPT Initial  
   lambda_h = learnHyperParam(regvallist,data.matrix(data.frame(X=X)),Y,1)/nrow(OBS)
-  mygradW = WERMGradient(N=nrow(OBS),inputMat = data.matrix(data.frame(X,Z)),labelVal = Y, evalMat =  data.matrix(data.frame(X,Z)), lambda_h = lambda_h, lambda_W = lambda_W,iterMax = 1000000,init_W=SW_importance_sampling, LossFun=napkin_lossfun, GradFun=napkin_gradfun)
+  mygradW = WERMGradient(N=nrow(OBS),inputMat = data.matrix(data.frame(X,Z)),labelVal = Y, evalMat =  data.matrix(data.frame(X,Z)), lambda_h = lambda_h,  lambda_W = lambda_W, iterMax = 1000000, init_W=SW_importance_sampling, LossFun=napkin_lossfun, GradFun=napkin_gradfun)
   
   Yx0 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(0,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)
   Yx1 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(1,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)
@@ -52,33 +54,34 @@ multiGlobal = function(OBS,D,numCate){
   return(GLOBALanswer)
 }
 
-source('napkin-data.R')
-# source('napkin-naive.R')
-source('napkin-param.R')
-# source('napkin-est.R')
-source('napkin-est-heuristic.R')
-# source('napkin-est3-opt.R')
-require(stats)
+# source('napkin-data.R')
+# # source('napkin-naive.R')
+# source('napkin-param.R')
+# # source('napkin-est.R')
+# source('napkin-est-heuristic.R')
+# source('napkin-est-ID.R')
+# # source('napkin-est3-opt.R')
+# require(stats)
+# 
+# N = 1000
+# Nintv = 1000000
+# 
+# D = 15
+# numCate = 2
+# C = numCate - 1
+# 
+# seednum = sample(1:1000000,1)
+# mytmp = dataGen(seednum,N,Nintv,D,C)
+# OBS = mytmp[[1]]
+# INTV = mytmp[[2]]
+# 
+# answer = c(mean(INTV[INTV$X.intv==0,'Y.intv']),mean(INTV[INTV$X.intv==1,'Y.intv']))
+# obsans = c(mean(OBS[OBS$X==0,'Y']),mean(OBS[OBS$X==1,'Y']))
 
-N = 1000
-Nintv = 1000000
-
-D = 15
-numCate = 2
-C = numCate - 1
-
-seednum = sample(1:1000000,1)
-mytmp = dataGen(seednum,N,Nintv,D,C)
-OBS = mytmp[[1]]
-INTV = mytmp[[2]]
-
-answer = c(mean(INTV[INTV$X.intv==0,'Y.intv']),mean(INTV[INTV$X.intv==1,'Y.intv']))
-obsans = c(mean(OBS[OBS$X==0,'Y']),mean(OBS[OBS$X==1,'Y']))
-
-WERManswer = multiHeuristic(OBS,D,numCate)
-GLOBALanswer = multiGlobal(OBS,D,numCate)
-PARAManswer = PlugInEstimator(OBS,D,numCate)
-
+# WERManswer = multiHeuristic(OBS,D,numCate)
+# GLOBALanswer = multiGlobal(OBS,D,numCate)
+# PARAManswer = PlugInEstimator(OBS,D,numCate)
+# IDanswer = multiID(OBS,D,numCate)
 # 
 # numSim = 10
 # paramList = rep(0,numSim)
