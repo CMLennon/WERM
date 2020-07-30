@@ -16,7 +16,8 @@ library(mise)
 library(tictoc)
 
 # Log Example
-## Rscript simulator.R 'napkin' 5 2 5 20 1 20 4 50 'napkin_temp'
+## Rscript simulator.R 'napkin' 5 2 12 20 1 20 4 50 'napkin_temp'
+## Rscript simulator.R 'mediator' 5 2 12 20 1 20 4 50 'mediator_temp'
 
 args = commandArgs(trailingOnly = TRUE)
 cores = detectCores()
@@ -59,7 +60,7 @@ if(probleminstance == 'napkin'){
 
 if(probleminstance == 'mediator'){
   source('mediator-data.R')
-  # source('mediator-est-global.R')
+  source('mediator-est-global.R')
   source('mediator-param.R')
   source('mediator-est-heuristic.R')
   source('mediator-est-ID.R')
@@ -67,7 +68,7 @@ if(probleminstance == 'mediator'){
 
 if(probleminstance == 'doubleeffect'){
   source('doubleeffect-data.R')
-  # source('doubleeffect-est-global.R')
+  source('doubleeffect-est-global.R')
   source('doubleeffect-param.R')
   source('doubleeffect-est-heuristic.R')
   source('doubleeffect-est-ID.R')

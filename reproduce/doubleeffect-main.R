@@ -1,11 +1,11 @@
 require(stats)
 library(mise)
 mise()
-source('mediator-data.R') 
-source('mediator-est-global.R')
-source('mediator-param.R')
-source('mediator-est-heuristic.R')
-source('mediator-est-ID.R')
+source('doubleeffect-data.R')
+source('doubleeffect-est-global.R')
+source('doubleeffect-param.R')
+source('doubleeffect-est-heuristic.R')
+source('doubleeffect-est-ID.R')
 
 N = 1000
 Nintv = 1000000
@@ -19,8 +19,20 @@ mytmp = dataGen(seednum,N,Nintv,D,C)
 OBS = mytmp[[1]]
 INTV = mytmp[[2]]
 
-answer = c(mean(INTV[INTV$X.intv==0,'Y.intv']),mean(INTV[INTV$X.intv==1,'Y.intv']))
-obsans = c(mean(OBS[OBS$X==0,'Y']),mean(OBS[OBS$X==1,'Y']))
+Xunique = unique(OBS$X)[order(unique(OBS$X))]
+Runique = unique(OBS$R)[order(unique(OBS$R))]
+answer = c(0,0,0,0)
+obsans = c(0,0,0,0)
+idx = 1 
+for (xval in Xunique){
+  for (rval in Runique){
+    INTVFiltered = subset(INTV,X.intv == xval & R.intv == rval)
+    OBSFiltered = subset(OBS,X == xval & R == rval)
+    answer[idx] = mean(OBSFiltered$Y)
+    obsans[idx] = mean(INTVFiltered$Y.intv)
+    idx = idx + 1 
+  }
+}
 
 WERManswer = multiHeuristic(OBS,D,numCate)
 PLUGINanswer = PlugInEstimator(OBS,D,numCate)

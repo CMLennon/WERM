@@ -31,10 +31,9 @@ multiGlobal = function(OBS,D,numCate){
   # Learn the Hyperparameter 
   ################################
   # Re-learn with the regularization
-  # regvallist = c(1:100)*(nrow(OBS))/20
-  regvallist = seq(0,10,by=0.2)
+  regvallist = c(1:100)*(nrow(OBS))/20
+  # regvallist = seq(0,10,by=0.2)
   lambda_W = learnHyperParam(regvallist,data.matrix(data.frame(W=W,Z=Z)),SW_importance_sampling,0)
-  # lambda_W = lambda_W/nrow(OBS)
   learned_W = learnWdash(SW_importance_sampling,data.matrix(data.frame(W=W,Z=Z)),lambda_W)
   
   if (sd(learned_W) == 0){
@@ -45,7 +44,7 @@ multiGlobal = function(OBS,D,numCate){
   # Predict Pw(y | x)
   ################################
   ##### OPT Initial  
-  lambda_h = learnHyperParam(regvallist,data.matrix(data.frame(X=X)),Y,1)/nrow(OBS)
+  lambda_h = learnHyperParam(regvallist,data.matrix(data.frame(X=X)),Y,1)
   mygradW = WERMGradient(N=nrow(OBS),inputMat = data.matrix(data.frame(X,Z)),labelVal = Y, evalMat =  data.matrix(data.frame(X,Z)), lambda_h = lambda_h,  lambda_W = lambda_W, iterMax = 1000000, init_W=SW_importance_sampling, LossFun=napkin_lossfun, GradFun=napkin_gradfun)
   
   Yx0 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(0,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= mygradW)

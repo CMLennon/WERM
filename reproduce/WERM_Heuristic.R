@@ -64,7 +64,7 @@ learnHyperParam = function(regvallist,invar,mylabel,learningbinary){
   minimum_error = performancerecord[which.min(performancerecord)]
   regvalcand = regvallist[performancerecord == minimum_error]
   regval = median(regvalcand)
-  return(regval)
+  return(regval/nrow(invar))
 }
 
 learnXG = function(inVar,labelval,regval){
