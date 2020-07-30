@@ -1,16 +1,16 @@
 require(stats)
 library(mise)
 mise()
-source('napkin-data.R')
-source('napkin-est-global.R')
-source('napkin-param.R')
-source('napkin-est-heuristic.R')
-source('napkin-est-ID.R')
+source('mediator-data.R') 
+source('mediator-est-global.R')
+source('mediator-param.R')
+source('mediator-est-heuristic.R')
+source('mediator-est-ID.R')
 
 N = 1000
 Nintv = 1000000
 
-D = 15
+D = 5
 numCate = 2
 C = numCate - 1
 
@@ -38,5 +38,3 @@ colnames(resultTbl) = c("PlugIn","Global","WERM","ID")
 rownames(resultTbl) = "Error"
 print(resultTbl)
 print(paste("Winner:",colnames(resultTbl)[which.min(resultArray)]))
-
-

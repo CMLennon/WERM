@@ -48,8 +48,8 @@ multiGlobal = function(OBS,D,numCate){
   lambda_h = learnHyperParam(regvallist,data.matrix(data.frame(X=X)),Y,1)/nrow(OBS)
   mygradW = WERMGradient(N=nrow(OBS),inputMat = data.matrix(data.frame(X,Z)),labelVal = Y, evalMat =  data.matrix(data.frame(X,Z)), lambda_h = lambda_h,  lambda_W = lambda_W, iterMax = 1000000, init_W=SW_importance_sampling, LossFun=napkin_lossfun, GradFun=napkin_gradfun)
   
-  Yx0 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(0,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)
-  Yx1 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(1,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)
+  Yx0 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(0,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= mygradW)
+  Yx1 = WERM_Heuristic(inVar_train = data.frame(X=X,Z=Z), inVar_eval = data.frame(X=rep(1,nrow(OBS)),Z=Z), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= mygradW)
   GLOBALanswer = c(Yx0,Yx1)
   return(GLOBALanswer)
 }

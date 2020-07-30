@@ -3,7 +3,7 @@ library(cowplot)
 
 # df.result = read.csv('200531-1745-napkin-time.csv')
 # df.result = read.csv('200531-1745-mediator-time.csv')
-df.result = read.csv('200531-1745-double-time.csv')
+# df.result = read.csv('200531-1745-double-time.csv')
 # df.result$adjtime.50 = df.result$adjtime.50 + rnorm(length(df.result$adjtime.50),mean=0,sd = 1e-1)
 # df.result$naivetime.50 = df.result$naivetime.50 + abs(rnorm(length(df.result$naivetime.50),mean=0,sd = 1e-1))
 

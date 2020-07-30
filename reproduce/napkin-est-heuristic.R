@@ -1,4 +1,6 @@
-source("WERM_Heuristic.R")
+library(xgboost)
+library(boot)
+source('WERM_Heuristic.R')
 
 multiHeuristic = function(OBS,D,numCate){
   ################################
@@ -9,7 +11,7 @@ multiHeuristic = function(OBS,D,numCate){
   X = OBS[,D+2]  
   Y = OBS[,D+3]
   DATA = data.frame(W,Z,X,Y)
-    
+  
   ################################
   # Compute SW 
   ################################
@@ -31,7 +33,5 @@ multiHeuristic = function(OBS,D,numCate){
   WERManswer = c(Yx0,Yx1)
   return(WERManswer)
 }
-
-
 
 

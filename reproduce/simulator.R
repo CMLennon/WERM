@@ -54,7 +54,6 @@ if(probleminstance == 'napkin'){
   source('napkin-param.R')
   source('napkin-est-heuristic.R')
   source('napkin-est-ID.R')
-  # source('napkin-naive.R')
 }
 
 
@@ -64,7 +63,6 @@ if(probleminstance == 'mediator'){
   source('mediator-param.R')
   source('mediator-est-heuristic.R')
   source('mediator-est-ID.R')
-  
 }
 
 if(probleminstance == 'doubleeffect'){
@@ -276,17 +274,17 @@ df.result = data.frame(Nlist, Y.intv.5,Y.intv.25,Y.intv.50,Y.intv.75,Y.intv.95,Y
                        Y.time.id.5,Y.time.id.25,Y.time.id.50,Y.time.id.75,Y.time.id.95,Y.time.id.mean,
                        Y.time.naive.5,Y.time.naive.25,Y.time.naive.50,Y.time.naive.75,Y.time.naive.95,Y.time.naive.mean
 )
-write.csv(df.result,paste(filetitle,"-summary.csv",sep=""))
-write.csv(mat.total.intv,paste(filetitle,"-intv.csv",sep=""))
-write.csv(mat.total.naive,paste(filetitle,"-param.csv",sep=""))
-write.csv(mat.total.heuristic,paste(filetitle,"-heuristic.csv",sep=""))
-write.csv(mat.total.global,paste(filetitle,"-global.csv",sep=""))
-write.csv(mat.total.id,paste(filetitle,"-id.csv",sep=""))
+write.csv(df.result,paste("Result/",filetitle,"-summary.csv",sep=""))
+write.csv(mat.total.intv,paste("Result/",filetitle,"-intv.csv",sep=""))
+write.csv(mat.total.naive,paste("Result/",filetitle,"-param.csv",sep=""))
+write.csv(mat.total.heuristic,paste("Result/",filetitle,"-heuristic.csv",sep=""))
+write.csv(mat.total.global,paste("Result/",filetitle,"-global.csv",sep=""))
+write.csv(mat.total.id,paste("Result/",filetitle,"-id.csv",sep=""))
 
-write.csv(mat.total.naive.time,paste(filetitle,"-time-param.csv",sep=""))
-write.csv(mat.total.heuristic.time,paste(filetitle,"-time-heuristic.csv",sep=""))
-write.csv(mat.total.global.time,paste(filetitle,"-time-global.csv",sep=""))
-write.csv(mat.total.id.time,paste(filetitle,"-time-id.csv",sep=""))
+write.csv(mat.total.naive.time,paste("Result/",filetitle,"-time-param.csv",sep=""))
+write.csv(mat.total.heuristic.time,paste("Result/",filetitle,"-time-heuristic.csv",sep=""))
+write.csv(mat.total.global.time,paste("Result/",filetitle,"-time-global.csv",sep=""))
+write.csv(mat.total.id.time,paste("Result/",filetitle,"-time-id.csv",sep=""))
 
 stopCluster(cl)  
 
