@@ -1,5 +1,6 @@
 require(stats)
 library(mise)
+library(tictoc)
 mise()
 source('napkin-data.R')
 source('napkin-est-global.R')
@@ -10,7 +11,7 @@ source('napkin-est-ID.R')
 N = 1000
 Nintv = 1000000
 
-D = 15
+D = 20
 numCate = 2
 C = numCate - 1
 
@@ -22,9 +23,12 @@ INTV = mytmp[[2]]
 answer = c(mean(INTV[INTV$X.intv==0,'Y.intv']),mean(INTV[INTV$X.intv==1,'Y.intv']))
 obsans = c(mean(OBS[OBS$X==0,'Y']),mean(OBS[OBS$X==1,'Y']))
 
-WERManswer = multiHeuristic(OBS,D,numCate)
-GLOBALanswer = multiGlobal(OBS,D,numCate)
-PLUGINanswer = PlugInEstimator(OBS,D,numCate)
+tic()
+WERManswer = multiHeuristic(OBS,D,numCate); toc()
+tic()
+GLOBALanswer = multiGlobal(OBS,D,numCate); toc()
+tic()
+PLUGINanswer = PlugInEstimator(OBS,D,numCate); toc()
 IDanswer = multiID(OBS,D,numCate)
 
 WERMperformance = mean(abs(WERManswer-answer))

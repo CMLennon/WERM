@@ -16,38 +16,38 @@ library(mise)
 library(tictoc)
 
 # Log Example
-## Rscript simulator.R 'napkin' 5 2 12 20 1 20 4 50 'napkin_temp'
-## Rscript simulator.R 'mediator' 5 2 12 20 1 20 4 50 'mediator_temp'
-
+## Rscript simulator.R 'napkin' 20 2 30 20 1 20 5 50 'napkin_0730_2300_D20'
+## Rscript simulator.R 'napkin' 5 2 10 20 1 20 5 50 'napkin_tmp'
+## nohup taskset -c 0-25 Rscript simulator.R 'napkin' 20 2 100 20 1 20 20 50 'napkin_tmp' >log-napkin-tmp.txt & 
 
 args = commandArgs(trailingOnly = TRUE)
 cores = detectCores()
+timeoutLim = 9999
 
-# probleminstance = args[1]
-# D = as.numeric(args[2])
-# numCate = as.numeric(args[3])
-# simRound = as.numeric(args[4])
-# totalN = as.numeric(args[5])
-# nidx.start = as.numeric(args[6])
-# nidx.end = as.numeric(args[7])
-# corenum = as.numeric(args[8])
-# NumUnit = as.numeric(args[9])
-# filetitle = args[10]
+probleminstance = args[1]
+D = as.numeric(args[2])
+numCate = as.numeric(args[3])
+simRound = as.numeric(args[4])
+totalN = as.numeric(args[5])
+nidx.start = as.numeric(args[6])
+nidx.end = as.numeric(args[7])
+corenum = as.numeric(args[8])
+NumUnit = as.numeric(args[9])
+filetitle = args[10]
 
-# Example 
-probleminstance = 'doubleeffect'
+# Example
+probleminstance = 'napkin'
 D = 5
 numCate = 2
-simRound = 5
+simRound = 20
 totalN = 20
 nidx.start = 1
 nidx.end = totalN
-corenum = 4
+corenum = 20
 NumUnit = 50
-filetitle = 'double_temp'
+filetitle = 'napkin_temp'
 
 Nintv = 10^7
-
 
 if(probleminstance == 'napkin'){
   source('napkin-data.R')
@@ -95,12 +95,12 @@ RunFunWithTime = function(TimeFUN, EstFUN, OBS,D,numCate,timelim){
 }
 
 print(probleminstance)
-cl = makeCluster(corenum)
+cl = makeCluster(corenum,outfile='log.txt')
 registerDoSNOW(cl)  
 
 C = numCate -1 
 Nlist = c(1:totalN)*NumUnit
-timeoutLim = 120
+
 
 mat.intv = matrix(0,nrow=totalN,ncol=6)
 mat.global = matrix(0,nrow=totalN,ncol=6)

@@ -146,6 +146,7 @@ ylimits = c(0,0.1)
 df.result = read.csv('Result/napkin_temp-summary.csv'); Dtitle = 'Napkin'
 # df.result = read.csv('Result/mediator_temp-summary.csv'); Dtitle = 'Mediator'
 # df.result = read.csv('Result/double_temp-summary.csv'); Dtitle = 'double'
+# df.result = read.csv('Result/napkin_0730_2300_D20-summary.csv'); Dtitle = 'Napkin'
 
 # General 
 regmethod = 'loess'
