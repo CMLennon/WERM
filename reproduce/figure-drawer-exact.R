@@ -133,7 +133,7 @@ library(mise)
 # df.result = read.csv('doubleeffect-200608-2300-D15-50-summary.csv'); Dtitle = 'Double D15'
 
 mise()
-ylimits = c(0,0.05)
+ylimits = c(0,0.1)
 # df.result = read.csv('napkin-200609-1500-D15-50-summary.csv'); Dtitle = 'Napkin D15'
 # df.result = read.csv('mediator-200609-2100-D15-50-summary.csv'); Dtitle = 'Mediator D15'
 # df.result = read.csv('doubleeffect-200609-2100-D15-50-summary.csv'); Dtitle = 'Double D15'
@@ -143,9 +143,9 @@ ylimits = c(0,0.05)
 # df.result = read.csv('doubleeffect-200614-0200-D20-50-summary.csv'); Dtitle = 'Double D20'
 # df.result = read.csv('napkin-200616-0200-D20-50-summary.csv'); Dtitle = 'Napkin D20'
 # df.result = read.csv('mediator-200617-0100-D20-50-summary.csv'); Dtitle = 'Mediator D20'
-# df.result = read.csv('Result/napkin_temp-summary.csv'); Dtitle = 'Napkin'
-df.result = read.csv('Result/mediator_temp-summary.csv'); Dtitle = 'Mediator'
-
+df.result = read.csv('Result/napkin_temp-summary.csv'); Dtitle = 'Napkin'
+# df.result = read.csv('Result/mediator_temp-summary.csv'); Dtitle = 'Mediator'
+# df.result = read.csv('Result/double_temp-summary.csv'); Dtitle = 'double'
 
 # General 
 regmethod = 'loess'

@@ -19,32 +19,32 @@ library(tictoc)
 ## Rscript simulator.R 'napkin' 5 2 12 20 1 20 4 50 'napkin_temp'
 ## Rscript simulator.R 'mediator' 5 2 12 20 1 20 4 50 'mediator_temp'
 
+
 args = commandArgs(trailingOnly = TRUE)
 cores = detectCores()
 
-probleminstance = args[1]
-D = as.numeric(args[2])
-numCate = as.numeric(args[3])
-simRound = as.numeric(args[4])
-totalN = as.numeric(args[5])
-nidx.start = as.numeric(args[6])
-nidx.end = as.numeric(args[7])
-corenum = as.numeric(args[8])
-NumUnit = as.numeric(args[9])
-filetitle = args[10]
+# probleminstance = args[1]
+# D = as.numeric(args[2])
+# numCate = as.numeric(args[3])
+# simRound = as.numeric(args[4])
+# totalN = as.numeric(args[5])
+# nidx.start = as.numeric(args[6])
+# nidx.end = as.numeric(args[7])
+# corenum = as.numeric(args[8])
+# NumUnit = as.numeric(args[9])
+# filetitle = args[10]
 
 # Example 
-# probleminstance = 'napkin'
-# D = 5
-# numCate = 2
-# simRound = 5
-# totalN = 20
-# nidx.start = 1
-# nidx.end = totalN
-# corenum = 4
-# NumUnit = 50
-# filetitle = 'napkin_temp'
-# 
+probleminstance = 'doubleeffect'
+D = 5
+numCate = 2
+simRound = 5
+totalN = 20
+nidx.start = 1
+nidx.end = totalN
+corenum = 4
+NumUnit = 50
+filetitle = 'double_temp'
 
 Nintv = 10^7
 
@@ -137,16 +137,31 @@ for (nidx in nidx.start:nidx.end){
                           mytmp = dataGen(seednum,N,Nintv,D,C)
                           OBS = mytmp[[1]]
                           INTV = mytmp[[2]]
-                          PLUGINanswer = paramAdj(OBS,D,numCate)
-                          GLOBALanswer = multiGlobal(OBS,D,numCate)
-                          HEURISTICanswer = multiHeuristic(OBS,D,numCate)
-                          IDanswer = multiID(OBS,D,numCate)
                           answer = c(mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==1),'Y.intv']),
                                      mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==1),'Y.intv']))
+                          
+                          PLUGINresult = RunFunWithTime(timeoutFun,PlugInEstimator,OBS,D,numCate,timeoutLim)
+                          PLUGINanswer = c(PLUGINresult[1],PLUGINresult[2],PLUGINresult[3],PLUGINresult[4])
+                          PLUGINtime = PLUGINresult[5]
+                          
+                          GLOBALresult = RunFunWithTime(timeoutFun,multiGlobal,OBS,D,numCate,timeoutLim)
+                          GLOBALanswer = c(GLOBALresult[1],GLOBALresult[2],GLOBALresult[3],GLOBALresult[4])
+                          GLOBALtime = GLOBALresult[5]
+                          
+                          HEURISTICresult = RunFunWithTime(timeoutFun,multiHeuristic,OBS,D,numCate,timeoutLim)
+                          HEURISTICanswer = c(HEURISTICresult[1],HEURISTICresult[2],HEURISTICresult[3],HEURISTICresult[4])
+                          HEURISTICtime = HEURISTICresult[5]
+                          
+                          IDresult = RunFunWithTime(timeoutFun,multiID,OBS,D,numCate,timeoutLim)
+                          IDanswer = c(IDresult[1],IDresult[2],IDresult[3],IDresult[4])
+                          IDtime = IDresult[5]
+                          
                           PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
                           GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
                           HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
                           IDperformance = mean(abs(answer-IDanswer),na.rm=T)
+                          
+                          
                         }else{
                           seednum = sample(1:1000000,1)
                           tmp = dataGen(seednum,N,Nintv,D,C)

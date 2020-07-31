@@ -94,7 +94,7 @@ multiGlobal = function(OBS,D,numCate){
   Yx1r1 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(1,nrow(DATA)),R=rep(1,nrow(DATA))), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= mygradW)  
   
   GLOBALanswer = c(Yx0r0,Yx0r1,Yx1r0,Yx1r1)
-  return(WERManswer)
+  return(GLOBALanswer)
 }
 
 
