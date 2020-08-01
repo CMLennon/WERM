@@ -10,7 +10,7 @@ source('mediator-est-ID.R')
 N = 1000
 Nintv = 1000000
 
-D = 5
+D = 20
 numCate = 2
 C = numCate - 1
 

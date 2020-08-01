@@ -36,18 +36,18 @@ NumUnit = as.numeric(args[9])
 filetitle = args[10]
 
 # Example
-probleminstance = 'napkin'
-D = 5
-numCate = 2
-simRound = 20
-totalN = 20
-nidx.start = 1
-nidx.end = totalN
-corenum = 20
-NumUnit = 50
-filetitle = 'napkin_temp'
-
-Nintv = 10^7
+# probleminstance = 'napkin'
+# D = 5
+# numCate = 2
+# simRound = 20
+# totalN = 20
+# nidx.start = 1
+# nidx.end = totalN
+# corenum = 4
+# NumUnit = 50
+# filetitle = 'napkin_temp'
+# 
+# Nintv = 10^7
 
 if(probleminstance == 'napkin'){
   source('napkin-data.R')
@@ -122,6 +122,73 @@ mat.total.heuristic.time = matrix(0,nrow=totalN,ncol=simRound)
 mat.total.id = matrix(0,nrow=totalN,ncol=simRound)
 mat.total.id.time = matrix(0,nrow=totalN,ncol=simRound)
 
+RunningFunction = function(idx){
+  if(probleminstance == 'doubleeffect'){
+    seednum = sample(1:1000000,1)
+    mytmp = dataGen(seednum,N,Nintv,D,C)
+    OBS = mytmp[[1]]
+    INTV = mytmp[[2]]
+    answer = c(mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==1),'Y.intv']),
+               mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==1),'Y.intv']))
+    
+    PLUGINresult = RunFunWithTime(timeoutFun,PlugInEstimator,OBS,D,numCate,timeoutLim)
+    PLUGINanswer = c(PLUGINresult[1],PLUGINresult[2],PLUGINresult[3],PLUGINresult[4])
+    PLUGINtime = PLUGINresult[5]
+    
+    GLOBALresult = RunFunWithTime(timeoutFun,multiGlobal,OBS,D,numCate,timeoutLim)
+    GLOBALanswer = c(GLOBALresult[1],GLOBALresult[2],GLOBALresult[3],GLOBALresult[4])
+    GLOBALtime = GLOBALresult[5]
+    
+    HEURISTICresult = RunFunWithTime(timeoutFun,multiHeuristic,OBS,D,numCate,timeoutLim)
+    HEURISTICanswer = c(HEURISTICresult[1],HEURISTICresult[2],HEURISTICresult[3],HEURISTICresult[4])
+    HEURISTICtime = HEURISTICresult[5]
+    
+    IDresult = RunFunWithTime(timeoutFun,multiID,OBS,D,numCate,timeoutLim)
+    IDanswer = c(IDresult[1],IDresult[2],IDresult[3],IDresult[4])
+    IDtime = IDresult[5]
+    
+    PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
+    GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
+    HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
+    IDperformance = mean(abs(answer-IDanswer),na.rm=T)
+    
+    
+  }else{
+    tic()
+    seednum = sample(1:1000000,1)
+    tmp = dataGen(seednum,N,Nintv,D,C)
+    OBS = tmp[[1]]
+    INTV = tmp[[2]]
+    answer = c(mean(INTV[INTV$X.intv==0,'Y.intv']),mean(INTV[INTV$X.intv==1,'Y.intv']))  
+    
+    PLUGINresult = RunFunWithTime(timeoutFun,PlugInEstimator,OBS,D,numCate,timeoutLim)
+    PLUGINanswer = c(PLUGINresult[1],PLUGINresult[2])
+    PLUGINtime = PLUGINresult[3]
+    
+    GLOBALresult = RunFunWithTime(timeoutFun,multiGlobal,OBS,D,numCate,timeoutLim)
+    GLOBALanswer = c(GLOBALresult[1],GLOBALresult[2])
+    GLOBALtime = GLOBALresult[3]
+    
+    HEURISTICresult = RunFunWithTime(timeoutFun,multiHeuristic,OBS,D,numCate,timeoutLim)
+    HEURISTICanswer = c(HEURISTICresult[1],HEURISTICresult[2])
+    HEURISTICtime = HEURISTICresult[3]
+    
+    IDresult = RunFunWithTime(timeoutFun,multiID,OBS,D,numCate,timeoutLim)
+    IDanswer = c(IDresult[1],IDresult[2])
+    IDtime = IDresult[3]
+    
+    PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
+    GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
+    HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
+    IDperformance = mean(abs(answer-IDanswer),na.rm=T)
+    toc()
+  }
+  answerperformance = 0 
+  
+  return(c(answerperformance,PLUGINperformance,GLOBALperformance,HEURISTICperformance,IDperformance,
+           PLUGINtime,GLOBALtime,HEURISTICtime,IDtime))
+}
+
 for (nidx in nidx.start:nidx.end){
   N = Nlist[nidx]
   print(N)
@@ -129,72 +196,80 @@ for (nidx in nidx.start:nidx.end){
   pb <- txtProgressBar(max = simRound, style = 3)
   progress <- function(n) setTxtProgressBar(pb, n)
   opts <- list(progress = progress)
-  val.total = foreach(idx= 1:simRound, .combine = 'rbind',
-                      .packages = c('survey', 'boot', 'ipw', 'Hmisc','R.utils','dplyr','arm','xgboost','tictoc'),.options.snow = opts) %dopar% {
-                        
-                        if(probleminstance == 'doubleeffect'){
-                          seednum = sample(1:1000000,1)
-                          mytmp = dataGen(seednum,N,Nintv,D,C)
-                          OBS = mytmp[[1]]
-                          INTV = mytmp[[2]]
-                          answer = c(mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==1),'Y.intv']),
-                                     mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==1),'Y.intv']))
-                          
-                          PLUGINresult = RunFunWithTime(timeoutFun,PlugInEstimator,OBS,D,numCate,timeoutLim)
-                          PLUGINanswer = c(PLUGINresult[1],PLUGINresult[2],PLUGINresult[3],PLUGINresult[4])
-                          PLUGINtime = PLUGINresult[5]
-                          
-                          GLOBALresult = RunFunWithTime(timeoutFun,multiGlobal,OBS,D,numCate,timeoutLim)
-                          GLOBALanswer = c(GLOBALresult[1],GLOBALresult[2],GLOBALresult[3],GLOBALresult[4])
-                          GLOBALtime = GLOBALresult[5]
-                          
-                          HEURISTICresult = RunFunWithTime(timeoutFun,multiHeuristic,OBS,D,numCate,timeoutLim)
-                          HEURISTICanswer = c(HEURISTICresult[1],HEURISTICresult[2],HEURISTICresult[3],HEURISTICresult[4])
-                          HEURISTICtime = HEURISTICresult[5]
-                          
-                          IDresult = RunFunWithTime(timeoutFun,multiID,OBS,D,numCate,timeoutLim)
-                          IDanswer = c(IDresult[1],IDresult[2],IDresult[3],IDresult[4])
-                          IDtime = IDresult[5]
-                          
-                          PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
-                          GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
-                          HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
-                          IDperformance = mean(abs(answer-IDanswer),na.rm=T)
-                          
-                          
-                        }else{
-                          seednum = sample(1:1000000,1)
-                          tmp = dataGen(seednum,N,Nintv,D,C)
-                          OBS = tmp[[1]]
-                          INTV = tmp[[2]]
-                          answer = c(mean(INTV[INTV$X.intv==0,'Y.intv']),mean(INTV[INTV$X.intv==1,'Y.intv']))  
-                          
-                          PLUGINresult = RunFunWithTime(timeoutFun,PlugInEstimator,OBS,D,numCate,timeoutLim)
-                          PLUGINanswer = c(PLUGINresult[1],PLUGINresult[2])
-                          PLUGINtime = PLUGINresult[3]
-                          
-                          GLOBALresult = RunFunWithTime(timeoutFun,multiGlobal,OBS,D,numCate,timeoutLim)
-                          GLOBALanswer = c(GLOBALresult[1],GLOBALresult[2])
-                          GLOBALtime = GLOBALresult[3]
-                          
-                          HEURISTICresult = RunFunWithTime(timeoutFun,multiHeuristic,OBS,D,numCate,timeoutLim)
-                          HEURISTICanswer = c(HEURISTICresult[1],HEURISTICresult[2])
-                          HEURISTICtime = HEURISTICresult[3]
-                          
-                          IDresult = RunFunWithTime(timeoutFun,multiID,OBS,D,numCate,timeoutLim)
-                          IDanswer = c(IDresult[1],IDresult[2])
-                          IDtime = IDresult[3]
-                          
-                          PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
-                          GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
-                          HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
-                          IDperformance = mean(abs(answer-IDanswer),na.rm=T)
-                        }
-                        answerperformance = 0 
-                        return(c(answerperformance,PLUGINperformance,GLOBALperformance,HEURISTICperformance,IDperformance,
-                                 PLUGINtime,GLOBALtime,HEURISTICtime,IDtime))
-                      }
-  close(pb)
+  
+  tic()
+  val.total = mclapply(1:simRound,RunningFunction,mc.cores = corenum); toc()
+  val.total = matrix(unlist(val.total),nrow=simRound,byrow=TRUE)
+  
+  # tic()
+  # val.total = foreach(idx= 1:simRound, .combine = 'rbind',
+  #                     .packages = c('survey', 'boot', 'ipw', 'Hmisc','R.utils','dplyr','arm','xgboost','tictoc'),.options.snow = opts) %dopar% {
+  # 
+  #                       if(probleminstance == 'doubleeffect'){
+  #                         seednum = sample(1:1000000,1)
+  #                         mytmp = dataGen(seednum,N,Nintv,D,C)
+  #                         OBS = mytmp[[1]]
+  #                         INTV = mytmp[[2]]
+  #                         answer = c(mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 0)&(INTV$R.intv==1),'Y.intv']),
+  #                                    mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==0),'Y.intv']),mean(INTV[(INTV$X.intv == 1)&(INTV$R.intv==1),'Y.intv']))
+  # 
+  #                         PLUGINresult = RunFunWithTime(timeoutFun,PlugInEstimator,OBS,D,numCate,timeoutLim)
+  #                         PLUGINanswer = c(PLUGINresult[1],PLUGINresult[2],PLUGINresult[3],PLUGINresult[4])
+  #                         PLUGINtime = PLUGINresult[5]
+  # 
+  #                         GLOBALresult = RunFunWithTime(timeoutFun,multiGlobal,OBS,D,numCate,timeoutLim)
+  #                         GLOBALanswer = c(GLOBALresult[1],GLOBALresult[2],GLOBALresult[3],GLOBALresult[4])
+  #                         GLOBALtime = GLOBALresult[5]
+  # 
+  #                         HEURISTICresult = RunFunWithTime(timeoutFun,multiHeuristic,OBS,D,numCate,timeoutLim)
+  #                         HEURISTICanswer = c(HEURISTICresult[1],HEURISTICresult[2],HEURISTICresult[3],HEURISTICresult[4])
+  #                         HEURISTICtime = HEURISTICresult[5]
+  # 
+  #                         IDresult = RunFunWithTime(timeoutFun,multiID,OBS,D,numCate,timeoutLim)
+  #                         IDanswer = c(IDresult[1],IDresult[2],IDresult[3],IDresult[4])
+  #                         IDtime = IDresult[5]
+  # 
+  #                         PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
+  #                         GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
+  #                         HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
+  #                         IDperformance = mean(abs(answer-IDanswer),na.rm=T)
+  # 
+  # 
+  #                       }else{
+  #                         seednum = sample(1:1000000,1)
+  #                         tmp = dataGen(seednum,N,Nintv,D,C)
+  #                         OBS = tmp[[1]]
+  #                         INTV = tmp[[2]]
+  #                         answer = c(mean(INTV[INTV$X.intv==0,'Y.intv']),mean(INTV[INTV$X.intv==1,'Y.intv']))
+  # 
+  #                         PLUGINresult = RunFunWithTime(timeoutFun,PlugInEstimator,OBS,D,numCate,timeoutLim)
+  #                         PLUGINanswer = c(PLUGINresult[1],PLUGINresult[2])
+  #                         PLUGINtime = PLUGINresult[3]
+  # 
+  #                         GLOBALresult = RunFunWithTime(timeoutFun,multiGlobal,OBS,D,numCate,timeoutLim)
+  #                         GLOBALanswer = c(GLOBALresult[1],GLOBALresult[2])
+  #                         GLOBALtime = GLOBALresult[3]
+  # 
+  #                         HEURISTICresult = RunFunWithTime(timeoutFun,multiHeuristic,OBS,D,numCate,timeoutLim)
+  #                         HEURISTICanswer = c(HEURISTICresult[1],HEURISTICresult[2])
+  #                         HEURISTICtime = HEURISTICresult[3]
+  # 
+  #                         IDresult = RunFunWithTime(timeoutFun,multiID,OBS,D,numCate,timeoutLim)
+  #                         IDanswer = c(IDresult[1],IDresult[2])
+  #                         IDtime = IDresult[3]
+  # 
+  #                         PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
+  #                         GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
+  #                         HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
+  #                         IDperformance = mean(abs(answer-IDanswer),na.rm=T)
+  #                       }
+  #                       answerperformance = 0
+  #                       return(c(answerperformance,PLUGINperformance,GLOBALperformance,HEURISTICperformance,IDperformance,
+  #                                PLUGINtime,GLOBALtime,HEURISTICtime,IDtime))
+  #                     }
+  # toc()
+  # close(pb)
+  
   
   
   val.intv = val.total[,1]
