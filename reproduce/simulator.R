@@ -17,26 +17,37 @@ library(tictoc)
 
 # Log Example
 ## Rscript simulator.R 'napkin' 20 2 30 20 1 20 5 50 'napkin_0730_2300_D20'
-## Rscript simulator.R 'napkin' 5 2 10 20 1 20 5 50 'napkin_tmp'
-## nohup taskset -c 0-25 Rscript simulator.R 'napkin' 20 2 100 20 1 20 20 50 'napkin_tmp' >log-napkin-tmp.txt & 
+## nohup taskset -c 0-29 Rscript simulator.R 'napkin' 20 2 100 20 1 20 25 50 'napkin-0801-0140-D20' >log-napkin-0801-0140-D20.txt & 
 
 args = commandArgs(trailingOnly = TRUE)
 cores = detectCores()
-timeoutLim = 9999
+timeoutLim = 1000000
+Nintv = 10^7
 
-probleminstance = args[1]
-D = as.numeric(args[2])
-numCate = as.numeric(args[3])
-simRound = as.numeric(args[4])
-totalN = as.numeric(args[5])
-nidx.start = as.numeric(args[6])
-nidx.end = as.numeric(args[7])
-corenum = as.numeric(args[8])
-NumUnit = as.numeric(args[9])
-filetitle = args[10]
+# probleminstance = args[1]
+# D = as.numeric(args[2])
+# numCate = as.numeric(args[3])
+# simRound = as.numeric(args[4])
+# totalN = as.numeric(args[5])
+# nidx.start = as.numeric(args[6])
+# nidx.end = as.numeric(args[7])
+# corenum = as.numeric(args[8])
+# NumUnit = as.numeric(args[9])
+# filetitle = args[10]
 
 # Example
-# probleminstance = 'napkin'
+probleminstance = 'napkin'
+D = 20
+numCate = 2
+simRound = 100
+totalN = 20
+nidx.start = 1
+nidx.end = totalN
+corenum = 15
+NumUnit = 50
+filetitle = paste(probleminstance,'-0801-0222',sep="")
+
+# probleminstance = 'mediator'
 # D = 5
 # numCate = 2
 # simRound = 20
@@ -45,9 +56,8 @@ filetitle = args[10]
 # nidx.end = totalN
 # corenum = 4
 # NumUnit = 50
-# filetitle = 'napkin_temp'
-# 
-# Nintv = 10^7
+# filetitle = paste(probleminstance,'-temp',sep="")
+
 
 if(probleminstance == 'napkin'){
   source('napkin-data.R')
@@ -95,12 +105,12 @@ RunFunWithTime = function(TimeFUN, EstFUN, OBS,D,numCate,timelim){
 }
 
 print(probleminstance)
-cl = makeCluster(corenum,outfile='log.txt')
-registerDoSNOW(cl)  
+# cl = makeSOCKcluster(corenum,outfile='log-parallel.txt')
+# registerDoParallel(numCores)  # use multicore, set to the number of our cores
+# registerDoSEQ(cl)
 
 C = numCate -1 
 Nlist = c(1:totalN)*NumUnit
-
 
 mat.intv = matrix(0,nrow=totalN,ncol=6)
 mat.global = matrix(0,nrow=totalN,ncol=6)
@@ -152,9 +162,7 @@ RunningFunction = function(idx){
     HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
     IDperformance = mean(abs(answer-IDanswer),na.rm=T)
     
-    
   }else{
-    tic()
     seednum = sample(1:1000000,1)
     tmp = dataGen(seednum,N,Nintv,D,C)
     OBS = tmp[[1]]
@@ -181,10 +189,9 @@ RunningFunction = function(idx){
     GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
     HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
     IDperformance = mean(abs(answer-IDanswer),na.rm=T)
-    toc()
   }
   answerperformance = 0 
-  
+  system(paste("echo 'Progressing:",round((idx/simRound)*100,2),"%","'"))
   return(c(answerperformance,PLUGINperformance,GLOBALperformance,HEURISTICperformance,IDperformance,
            PLUGINtime,GLOBALtime,HEURISTICtime,IDtime))
 }
@@ -193,17 +200,18 @@ for (nidx in nidx.start:nidx.end){
   N = Nlist[nidx]
   print(N)
   
-  pb <- txtProgressBar(max = simRound, style = 3)
-  progress <- function(n) setTxtProgressBar(pb, n)
-  opts <- list(progress = progress)
+  # pb <- txtProgressBar(max = simRound, style = 3)
+  # progress <- function(n) setTxtProgressBar(pb, n)
+  # opts <- list(progress = progress)
   
-  tic()
-  val.total = mclapply(1:simRound,RunningFunction,mc.cores = corenum); toc()
+  val.total = mclapply(1:simRound,RunningFunction,mc.cores = corenum)
   val.total = matrix(unlist(val.total),nrow=simRound,byrow=TRUE)
   
   # tic()
   # val.total = foreach(idx= 1:simRound, .combine = 'rbind',
   #                     .packages = c('survey', 'boot', 'ipw', 'Hmisc','R.utils','dplyr','arm','xgboost','tictoc'),.options.snow = opts) %dopar% {
+  # val.total = foreach(idx= 1:simRound, .combine = 'rbind',
+  #                     .packages = c('survey', 'boot', 'ipw', 'Hmisc','R.utils','dplyr','arm','xgboost','tictoc')) %dopar% {
   # 
   #                       if(probleminstance == 'doubleeffect'){
   #                         seednum = sample(1:1000000,1)
@@ -269,8 +277,6 @@ for (nidx in nidx.start:nidx.end){
   #                     }
   # toc()
   # close(pb)
-  
-  
   
   val.intv = val.total[,1]
   val.naive = val.total[,2]
@@ -377,7 +383,7 @@ write.csv(mat.total.heuristic.time,paste("Result/",filetitle,"-time-heuristic.cs
 write.csv(mat.total.global.time,paste("Result/",filetitle,"-time-global.csv",sep=""))
 write.csv(mat.total.id.time,paste("Result/",filetitle,"-time-id.csv",sep=""))
 
-stopCluster(cl)  
+# stopCluster(cl)  
 
 
 

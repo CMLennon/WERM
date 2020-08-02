@@ -50,8 +50,9 @@ PlugInEstimator = function(OBS,D,numCate){
   evalMat_Y = as.matrix(allpossible[,1:(ncol(allpossible))])
   model_Y = learnXG(inVar=inVarMat_Y,labelval=Y,regval=rep(0,nrow(DATA)))
   pred_Y = predict(model_Y,newdata=evalMat_Y,type='response')
-  Ytable = allpossible 
-  Ytable[,'prob'] = pred_Y
+  allpossible[,'prob.Y'] = pred_Y
+  # Ytable = allpossible 
+  # Ytable[,'prob'] = pred_Y
   
   ################################################################################
   # Learn P(x|z,w)
@@ -61,8 +62,9 @@ PlugInEstimator = function(OBS,D,numCate){
   model_X = learnXG(inVar=inVarMat_X,labelval=X,regval=rep(0,nrow(DATA)))
   pred_X = predict(model_X,newdata=evalMat_X,type='response')
   prob_X = pred_X*allpossible$X + (1-pred_X)*(1-allpossible$X)
-  Xtable = allpossible 
-  Xtable[,'prob'] = prob_X
+  allpossible[,'prob.X.ZW'] = prob_X
+  # Xtable = allpossible 
+  # Xtable[,'prob'] = prob_X
   
   ################################################################################
   # Learn P(w)
@@ -81,39 +83,32 @@ PlugInEstimator = function(OBS,D,numCate){
     resultval = predval * allpossible[d] + (1-predval) * (1-allpossible[d])
     tmp = tmp * resultval
   }
-  Wtable = allpossible
-  Wtable[,(ncol(allpossible)+1)] = tmp
-  colnames(Wtable)[ncol(Wtable)] = 'prob'
+  allpossible[,'prob.W'] = tmp
+  # Wtable = allpossible
+  # Wtable[,(ncol(allpossible)+1)] = tmp
+  # colnames(Wtable)[ncol(Wtable)] = 'prob'
   
   ################################################################################
   # Evaluate 
   ################################################################################
-  allpossibleOrig = allpossible
+  # allpossibleOrig = allpossible
+  allpossible[,'val1'] = allpossible[,'prob.Y'] * allpossible[,'prob.X.ZW'] * allpossible[,'prob.W']
+  allpossible[,'val2'] = allpossible[,'prob.X.ZW'] * allpossible[,'prob.W']
   
-  ComputeVal = allpossible
-  ComputeVal$val1 = Ytable$prob * Xtable$prob * Wtable$prob
-  ComputeVal$val2 = Xtable$prob * Wtable$prob
-  
-  ## Marginalizing over W
-  tmp = c()
-  tmp = append(tmp, list(c(0:1))) # R
-  tmp = append(tmp,list(c(0,1))) # X
-  allpossible = expand.grid(tmp)
-  colnames(allpossible) = c('R','X')
-  ComputeVal.MarginW = allpossible
-  ComputeVal.MarginW$val1 = 0
-  ComputeVal.MarginW$val2 = 0
-  
-  for (rval in (0:1)){
-    for(xval in (0:1)){
-      ComputeVal.MarginW[ComputeVal.MarginW$R==rval & ComputeVal.MarginW$X==xval,'val1'] = sum(ComputeVal[ComputeVal$X==xval & ComputeVal$R==rval,'val1'],na.rm=T)
-      ComputeVal.MarginW[ComputeVal.MarginW$R==rval & ComputeVal.MarginW$X==xval,'val2'] = sum(ComputeVal[ComputeVal$X==xval & ComputeVal$R==rval,'val2'],na.rm=T)
+  prob.XY.do.R = rep(0,4)
+  prob.X.do.R = rep(0,4)
+  idx = 1 
+  for (xval in (0:1)){
+    for(rval in (0:1)){
+      prob.XY.do.R[idx] = sum(allpossible[allpossible$X==xval & allpossible$R == rval, 'val1'],na.rm=T) 
+      prob.X.do.R[idx] = sum(allpossible[allpossible$X==xval & allpossible$R == rval, 'val2'],na.rm=T) 
+      idx = idx + 1 
     }
   }
-  ComputeVal.MarginW$val3 = exp(log(ComputeVal.MarginW$val1) - log(ComputeVal.MarginW$val2))
+  cand.prob.Y.do.X = exp(log(prob.XY.do.R) - log(prob.X.do.R))
+  Yx0 = mean(cand.prob.Y.do.X[c(1:2)])
+  Yx1 = mean(cand.prob.Y.do.X[c(3:4)])
   
-  Yx0 = mean(ComputeVal.MarginW[ComputeVal.MarginW$X==0,'val3'],na.rm = T)
-  Yx1 = mean(ComputeVal.MarginW[ComputeVal.MarginW$X==1,'val3'],na.rm = T)
   
   return(c(Yx0,Yx1))
 }
