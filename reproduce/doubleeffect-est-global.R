@@ -83,10 +83,10 @@ multiGlobal = function(OBS,D,numCate){
   
   mygradW = WERMGradient(N=nrow(OBS),inputMat = data.matrix(data.frame(X, R)),labelVal = Y, evalMat =  data.matrix(data.frame(X,R)), lambda_h = lambda_h,  lambda_W = lambda_W, iterMax = 1000000, init_W=W_importance, LossFun=mylossfun, GradFun=mygradfun)
   
-  X0R0 = data.matrix(data.frame(X=rep(0,nrow(DATA)),R=rep(0,nrow(DATA))))
-  X0R1 = data.matrix(data.frame(X=rep(0,nrow(DATA)),R=rep(1,nrow(DATA))))
-  X1R0 = data.matrix(data.frame(X=rep(1,nrow(DATA)),R=rep(0,nrow(DATA))))
-  X1R1 = data.matrix(data.frame(X=rep(1,nrow(DATA)),R=rep(1,nrow(DATA))))
+  # X0R0 = data.matrix(data.frame(X=rep(0,nrow(DATA)),R=rep(0,nrow(DATA))))
+  # X0R1 = data.matrix(data.frame(X=rep(0,nrow(DATA)),R=rep(1,nrow(DATA))))
+  # X1R0 = data.matrix(data.frame(X=rep(1,nrow(DATA)),R=rep(0,nrow(DATA))))
+  # X1R1 = data.matrix(data.frame(X=rep(1,nrow(DATA)),R=rep(1,nrow(DATA))))
   
   Yx0r0 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(0,nrow(DATA)),R=rep(0,nrow(DATA))), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= mygradW)  
   Yx0r1 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(0,nrow(DATA)),R=rep(1,nrow(DATA))), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= mygradW)  

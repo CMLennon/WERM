@@ -72,8 +72,9 @@ PlugInEstimator = function(OBS,D){
   evalMat_Y = as.matrix(allpossible[,1:(ncol(allpossible))])
   model_Y = learnXG(inVar=inVarMat_Y,labelval=Y,regval=rep(0,nrow(DATA)))
   pred_Y = predict(model_Y,newdata=evalMat_Y,type='response')
-  Ytable = allpossible 
-  Ytable[,'prob'] = pred_Y
+  allpossible[,'prob.Y'] = pred_Y
+  # Ytable = allpossible 
+  # Ytable[,'prob'] = pred_Y
 
   ################################################################################
   # Learn P(x|z,w)
@@ -83,8 +84,9 @@ PlugInEstimator = function(OBS,D){
   model_X = learnXG(inVar=inVarMat_X,labelval=X,regval=rep(0,nrow(DATA)))
   pred_X = predict(model_X,newdata=evalMat_X,type='response')
   prob_X = pred_X*allpossible$X + (1-pred_X)*(1-allpossible$X)
-  Xtable = allpossible 
-  Xtable[,'prob'] = prob_X
+  allpossible[,'prob.X.ZW'] = prob_X
+  # Xtable = allpossible 
+  # Xtable[,'prob'] = prob_X
 
   ################################################################################
   # Learn P(w)
@@ -103,9 +105,10 @@ PlugInEstimator = function(OBS,D){
     resultval = predval * allpossible[d] + (1-predval) * (1-allpossible[d])
     tmp = tmp * resultval
   }
-  Wtable = allpossible
-  Wtable[,(ncol(allpossible)+1)] = tmp
-  colnames(Wtable)[ncol(Wtable)] = 'prob'
+  allpossible[,'prob.W'] = tmp
+  # Wtable = allpossible
+  # Wtable[,(ncol(allpossible)+1)] = tmp
+  # colnames(Wtable)[ncol(Wtable)] = 'prob'
     
   ################################################################################
   # Evaluate 

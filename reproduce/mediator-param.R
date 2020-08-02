@@ -7,9 +7,7 @@ ExpYParam_xg  = function(allpossible,DATA){
   outVar = DATA$Y
   model_xgboost = xgboost(verbose = 0, data = data.matrix(inVar), label = outVar, nrounds = 20,max.depth=10,lambda=0,alpha=0, objective = "binary:logistic")
   predval = predict(model_xgboost,newdata=predInVar,type='response')
-  Ytable = allpossible
-  Ytable$Y = predval
-  return(Ytable)
+  return(predval)
 }
 
 highdim_reg_xgboost = function(OBS, outVarVector){
@@ -58,6 +56,7 @@ PlugInEstimator = function(OBS,D,numCate){
   ################################################################################
   # E[Y|X,Z,W]
   Ytable = ExpYParam_xg(allpossible,DATA)  
+  allpossible[,'prob.Y'] = ExpYParam_xg(allpossible,DATA)
   
   ################################################################################
   # Learn P(w)
@@ -76,37 +75,40 @@ PlugInEstimator = function(OBS,D,numCate){
     resultval = predval * allpossible[d] + (1-predval) * (1-allpossible[d])
     tmp = tmp * resultval
   }
-  PwTable = allpossible
-  PwTable[,(ncol(allpossible)+1)] = tmp
-  colnames(PwTable)[ncol(PwTable)] = 'prob'
+  allpossible[,'prob.W'] = tmp 
+  # PwTable = allpossible
+  # PwTable[,(ncol(allpossible)+1)] = tmp
+  # colnames(PwTable)[ncol(PwTable)] = 'prob'
   ################################################################################
   
   ################################################################################
   # Learn P(x|w)
   ################################################################################
-  PxTable = allpossible 
+  # PxTable = allpossible 
   inVar = data.matrix(W)
   outVar = X 
   predInVar = data.matrix(allpossible[,c(1:D)])
   model.X = xgboost(verbose=0, data=inVar,label=outVar, nrounds = 20,max.depth=10,lambda=0,alpha=0, objective = "binary:logistic")
   predX = predict(model.X,newdata = predInVar,type="response")
   tmp = predX*allpossible$X + (1-predX)*(1-allpossible$X)
-  PxTable[,(ncol(allpossible)+1)] = tmp
-  colnames(PxTable)[ncol(PxTable)] = 'prob'
+  allpossible[,'prob.X.W'] = tmp 
+  # PxTable[,(ncol(allpossible)+1)] = tmp
+  # colnames(PxTable)[ncol(PxTable)] = 'prob'
   ################################################################################
   
   ################################################################################
   # Learn P(z|x,w)
   ################################################################################
-  PzTable = allpossible 
+  # PzTable = allpossible 
   inVar = data.matrix(data.frame(W,X))
   outVar = Z 
   predInVar = data.matrix(allpossible[,c(1:(D+1))])
   model.Z = xgboost(verbose=0, data=inVar,label=outVar, nrounds = 20,max.depth=10,lambda=0,alpha=0, objective = "binary:logistic")
   predZ = predict(model.Z,newdata = predInVar,type="response")
   tmp = predZ*allpossible$Z + (1-predZ)*(1-allpossible$Z)
-  PzTable[,(ncol(allpossible)+1)] = tmp
-  colnames(PzTable)[ncol(PzTable)] = 'prob'
+  allpossible[,'prob.Z.XW'] = tmp
+  # PzTable[,(ncol(allpossible)+1)] = tmp
+  # colnames(PzTable)[ncol(PzTable)] = 'prob'
   ################################################################################
   
   
@@ -114,21 +116,35 @@ PlugInEstimator = function(OBS,D,numCate){
   # Compute! 
   ################################################################################
   # Store the original table 
-  allpossibleOrig = allpossible
-  ComputeVal = allpossible
+  # allpossibleOrig = allpossible
+  # ComputeVal = allpossible
   
   # Compute E[Y|W,X,Z] * P(X|W)
-  ComputeVal$YX = Ytable$Y * PxTable$prob
+  # ComputeVal$YX = Ytable$Y * PxTable$prob
+  allpossible[,'YX'] = allpossible[,'prob.Y'] * allpossible[,'prob.X.W']
+  
   # Compute P(Z|X,W) * P(W)
-  ComputeVal$ZW = PzTable$prob * PwTable$prob
-  # Marginalize for X 
-  Margin.over.x.YX = ComputeVal[ComputeVal$X==0,'YX'] + ComputeVal[ComputeVal$X==1,'YX']
-  # Fix X=x for P(Z|x,W) * P(W)
-  ZW.X0 = ComputeVal[ComputeVal$X==0,'ZW']
-  ZW.X1 = ComputeVal[ComputeVal$X==1,'ZW']
-  # Compute Causal effect 
-  Yx0 = sum(Margin.over.x.YX * ZW.X0)
-  Yx1 = sum(Margin.over.x.YX * ZW.X1)
+  # ComputeVal$ZW = PzTable$prob * PwTable$prob
+  allpossible[,'ZW'] = allpossible[,'prob.Z.XW'] * allpossible[,'prob.W']
+  
+  xval = 0 
+  Yx0 = sum((allpossible[allpossible$X==0,'YX'] + allpossible[allpossible$X==1,'YX']) * # Margin over X for YX 
+    (allpossible[allpossible$X == xval,'ZW'])) # Fix X=x for P(Z|x,W) * P(W)
+  
+  
+  xval = 1 
+  Yx1 = sum((allpossible[allpossible$X==0,'YX'] + allpossible[allpossible$X==1,'YX']) * # Margin over X for YX 
+    (allpossible[allpossible$X == xval,'ZW'])) # Fix X=x for P(Z|x,W) * P(W)
+  # 
+  # 
+  # # Marginalize for X 
+  # Margin.over.x.YX = ComputeVal[ComputeVal$X==0,'YX'] + ComputeVal[ComputeVal$X==1,'YX']
+  # # Fix X=x for P(Z|x,W) * P(W)
+  # ZW.X0 = ComputeVal[ComputeVal$X==0,'ZW']
+  # ZW.X1 = ComputeVal[ComputeVal$X==1,'ZW']
+  # # Compute Causal effect 
+  # Yx0 = sum(Margin.over.x.YX * ZW.X0)
+  # Yx1 = sum(Margin.over.x.YX * ZW.X1)
   myans = c(Yx0,Yx1)
   return(myans)
 }
