@@ -1,190 +1,167 @@
 library(ggplot2)
 library(cowplot)
 library(mise)
-
-################################################################################################
-# For NeurIPS2020 
-################################################################################################
-# mise()
-# ylimits = c(0,0.2)
-# df.result = read.csv('exact_mediator-200530-2300-5-50-10-10.csv'); Dtitle = "Mediator D5"
-# df.result = read.csv('exact_mediator-200530-2300-10-50-10-10.csv'); Dtitle = "Mediator D10"
-# df.result = read.csv('exact_mediator-200530-2300-15-50-10-10.csv'); Dtitle = 'Mediator D15'
-# df.result = read.csv('exact_mediator-200530-2300-20-20-10-10.csv'); Dtitle = 'Mediator D20'
-
-# df.result = read.csv('exact_double-200530-2300-5-50-10-10.csv'); Dtitle = 'Double D5'
-# df.result = read.csv('exact_double-200530-2300-10-50-10-10.csv'); Dtitle= 'Double D10'
-# df.result = read.csv('exact_double-200530-2300-15-50-10-10.csv'); Dtitle = 'Double D15'
-# df.result = read.csv('exact_double-200530-2300-20-50-10-10.csv'); Dtitle = 'Double D20'
-
-
-# df.result = read.csv('exact_napkin-200531-0200-5-50-10-10.csv'); Dtitle = 'Napkin D5'
-# # df.result = read.csv('exact_napkin-200531-0200-10-50-10-10.csv'); Dtitle = 'Napkin D10'
-# # df.result = read.csv('exact_napkin-200531-0200-15-50-10-10.csv'); Dtitle = 'Napkin D15'
-
-# mise() 
-# df.result = read.csv('exact2_napkin-200531-1100-5-50-10-10.csv'); Dtitle = 'Napkin-Compare with Exact'
-# df.result = read.csv('exact2_napkin-200531-1100-10-50-10-10.csv'); Dtitle = 'Napkin-Compare with Exact'
-# df.result = read.csv('exact2_napkin-200531-1100-15-20-10-10.csv'); Dtitle = 'Napkin-Compare with Exact'
-# df.result = read.csv('exact2_napkin-200531-1100-20-20-10-10.csv'); Dtitle = 'Napkin-Compare with Exact'
-
-# df.result = read.csv('exact2_mediator-200531-1100-5-50-10-10.csv'); Dtitle = 'Mediator-Compare with Exact'
-# df.result = read.csv('exact2_mediator-200531-1100-10-20-10-10.csv'); Dtitle = 'Mediator-Compare with Exact'
-# df.result = read.csv('exact2_mediator-200531-1100-15-20-10-10.csv'); Dtitle = 'Mediator-Compare with Exact'
-
-# df.result = read.csv('exact2_double-200531-1100-5-50-10-10.csv'); Dtitle = 'Double-Compare with Exact'
-# df.result = read.csv('exact2_double-200531-1100-10-50-10-10.csv'); Dtitle = 'Double-Compare with Exact'
-# df.result = read.csv('exact2_double-200531-1100-15-50-10-10.csv'); Dtitle = 'Double-Compare with Exact'
-
-# ylimits = c(0.01,0.05)
-# df.result = read.csv('exact_napkin-200601-0200-5.csv'); Dtitle = "New Napkin Exact D5"
-# df.result = read.csv('exact_napkin-200601-0200-10.csv'); Dtitle = "New Napkin Exact D10"
-# df.result = read.csv('exact_napkin-200601-0200-15.csv'); Dtitle = "New Napkin Exact D20"
-  
-# ylimits = c(0,0.1)
-# df.result = read.csv('exact_napkin-10-100-200601-0200-5-50.csv'); Dtitle = "New Napkin Exact 10 100 D5"
-# df.result = read.csv('exact_napkin-10-100-200601-0200-D10-50.csv'); Dtitle = "New Napkin Exact 10 100 D10"
-# df.result = read.csv('exact_napkin-10-100-200601-0200-D15-50.csv'); Dtitle = "New Napkin Exact 10 100 D10"
-
-# ylimits = c(0.01,0.05)
-# df.result = read.csv('exact_mediator-200601-0140-D5-50.csv'); Dtitle = "New Mediator Exact D5"
-# df.result = read.csv('exact_mediator-200601-0140-D10-50.csv'); Dtitle = "New Mediator Exact D10"
-# df.result = read.csv('exact_mediator-200601-0140-D15-50.csv'); Dtitle = "New Mediator Exact D15"
-
-# mise()
-# ylimits = c(0,0.15)
-# df.result = read.csv('exact_double-200601-0330-D5-50.csv'); Dtitle = "New Double Exact D5"
-# df.result = read.csv('exact_double-200601-0330-D10-50.csv'); Dtitle = "New Double Exact D10"
-# df.result = read.csv('exact_double-200601-0330-D15-50.csv'); Dtitle = "New Double Exact D15"
-
-# mise()
-# ylimits = c(0,0.05)
-# df.result = read.csv('exact_napkin-200601-0930-D5-50.csv'); Dtitle = "New Napkin Exact 5 D5"
-# df.result = read.csv('exact_napkin-200601-0930-D10-50.csv'); Dtitle = "New Napkin Exact 5 D10"
-# df.result = read.csv('exact_napkin-200601-0930-D15-50.csv'); Dtitle = "New Napkin Exact 5 D15"
-
-# mise()
-# ylimits = c(0,0.05)
-# df.result = read.csv('exact_mediator-200601-1030-D5-50.csv'); Dtitle = "New Mediator Exact D5"
-# df.result = read.csv('exact_mediator-200601-1030-D10-50.csv'); Dtitle = "New Mediator Exact D10"
-# df.result = read.csv('exact_mediator-200601-1030-D15-50.csv'); Dtitle = "New Mediator Exact D15"
-
-# ylimits = c(0,0.05)
-# df.result = read.csv('exact_mediator-200601-1200-D5-50.csv'); Dtitle = "New Mediator Exact D5"
-# df.result = read.csv('exact_mediator-200601-1200-D10-50.csv'); Dtitle = "New Mediator Exact D5"
-
-# ylimits = c(0,0.2)
-# df.result = read.csv('exact_napkin-naive-200601-1630-D5-50.csv'); Dtitle = "New Napkin Naive Exact D5"
-# df.result = read.csv('exact_napkin-naive-200601-1630-D10-50.csv'); Dtitle = "New Napkin Naive Exact D10"
-# df.result = read.csv('exact_napkin-naive-200601-1630-D15-50.csv'); Dtitle = "New Napkin Naive Exact D15"
-
-# ylimits = c(0,0.5)
-# df.result = read.csv('exact_mediator-naive-200601-1630-D5-50.csv'); Dtitle = "New Mediator Naive Exact D5"
-# df.result = read.csv('exact_mediator-naive-200601-1630-D10-50.csv'); Dtitle = "New Mediator Naive Exact D10"
-# df.result = read.csv('exact_mediator-naive-200601-1630-D15-50.csv'); Dtitle = "New Mediator Naive Exact D15"
-
-# ylimits = c(0,0.5)
-# df.result = read.csv('exact_double-naive-200601-1630-D5-50.csv'); Dtitle = "New Double Naive Exact D5"
-# df.result = read.csv('exact_double-naive-200601-1630-D10-50.csv'); Dtitle = "New Double Naive Exact D10"
-# df.result = read.csv('exact_double-naive-200601-1630-D15-50.csv'); Dtitle = "New Double Naive Exact D15"
-
-# ylimits = c(0,0.18)
-# df.result = read.csv('exact_napkin-10-100-200601-0200-D15-50.csv'); Dtitle = "Small Napkin D15"
-# df.result = read.csv('exact_mediator-200602-0400-D15-50-1-100.csv'); Dtitle = "Small Mediator D15"
-# df.result = read.csv('exact_double-200602-0400-D15-50-1-100.csv'); Dtitle = "Small Double D15"
-
-
-# ylimits = c(0,0.05)
-# df.result = read.csv('exact_mediator-200604-0100-D15-50-summary.csv'); Dtitle = "Mediator D15"
-# df.result = read.csv('exact_mediator-200604-0400-D15-50-summary.csv'); Dtitle = "Mediator D15"
-
-
-############ FINAL PLOT ############
-# mise()
-# D = 20
-# ylimits = c(0,0.05)
-# df.result = read.csv('exact_napkin-200601-0930-D20-50.csv'); Dtitle = "New Napkin Exact D20"
-# df.result = read.csv('exact_mediator-200601-1030-D20-50.csv'); Dtitle = "New Mediator Exact D20"
-# df.result15 = read.csv('exact_double-200601-0330-D20-50.csv'); Dtitle = "New Double Exact D20"
-
-# mise()
-# D = 15
-# ylimits = c(0,0.15)
-# df.result = read.csv('exact_napkin-200601-0930-D15-50.csv'); Dtitle = "New Napkin Exact 5 D15"
-# df.result = read.csv('exact_mediator-200601-1030-D15-50.csv'); Dtitle = "New Mediator Exact D15"
-# df.result = read.csv('exact_double-200601-0330-D15-50.csv'); Dtitle = "New Double Exact D15"
-
-# D = 10 
-# ylimits = c(0,0.15)
-# df.result = read.csv('exact_napkin-200601-0930-D10-50.csv'); Dtitle = "New Napkin Exact 5 D10"
-# df.result = read.csv('exact_mediator-200601-1030-D10-50.csv'); Dtitle = "New Mediator Exact D10"
-# df.result = read.csv('exact_double-200601-0330-D10-50.csv'); Dtitle = "New Double Exact D10"
-
-# D = 5
-# ylimits = c(0,0.15)
-# df.result = read.csv('exact_napkin-200601-0930-D5-50.csv'); Dtitle = "New Napkin Exact 5 D5"
-# df.result = read.csv('exact_mediator-200601-1030-D5-50.csv'); Dtitle = "New Mediator Exact D5"
-# df.result = read.csv('exact_double-200601-0330-D5-50.csv'); Dtitle = "New Double Exact D5"
-
-# mise()
-# ylimits = c(0,0.05)
-# df.result = read.csv('napkin-200608-2300-D15-50-summary.csv'); Dtitle = 'Napkin D15'
-# df.result = read.csv('mediator-200608-2300-D15-50-summary.csv'); Dtitle = 'Mediator D15'
-# df.result = read.csv('doubleeffect-200608-2300-D15-50-summary.csv'); Dtitle = 'Double D15'
+library(mgcv)
 
 mise()
-ylimits = c(0,0.1)
-# df.result = read.csv('napkin-200609-1500-D15-50-summary.csv'); Dtitle = 'Napkin D15'
-# df.result = read.csv('mediator-200609-2100-D15-50-summary.csv'); Dtitle = 'Mediator D15'
-# df.result = read.csv('doubleeffect-200609-2100-D15-50-summary.csv'); Dtitle = 'Double D15'
-# df.result = read.csv('doubleeffect-200610-1130-D15-50-summary.csv'); Dtitle = 'Double D15'
-# df.result = read.csv('doubleeffect-200613-1130-D15-50-summary.csv'); Dtitle = 'Double D15'
 
-# df.result = read.csv('doubleeffect-200614-0200-D20-50-summary.csv'); Dtitle = 'Double D20'
-# df.result = read.csv('napkin-200616-0200-D20-50-summary.csv'); Dtitle = 'Napkin D20'
-# df.result = read.csv('mediator-200617-0100-D20-50-summary.csv'); Dtitle = 'Mediator D20'
-df.result = read.csv('Result/napkin_temp-summary.csv'); Dtitle = 'Napkin'
-# df.result = read.csv('Result/mediator_temp-summary.csv'); Dtitle = 'Mediator'
-# df.result = read.csv('Result/double_temp-summary.csv'); Dtitle = 'double'
-# df.result = read.csv('Result/napkin_0730_2300_D20-summary.csv'); Dtitle = 'Napkin'
+returnPred = function(df.result,modelmode,mean_median,myNlist){
+  if (modelmode == "global"){
+    if (mean_median == "mean"){
+      smoothModel = gam(Y.global.mean~s(Nlist),data=df.result)   
+    }else{
+      smoothModel = gam(Y.global.50~s(Nlist),data=df.result)   
+    }
+  }
+  else if (modelmode == "plugin"){
+    if (mean_median == "mean"){
+      smoothModel = gam(Y.plugin.mean~s(Nlist),data=df.result)   
+    }else{
+      smoothModel = gam(Y.plugin.50~s(Nlist),data=df.result)   
+    }
+  }
+  else if (modelmode == "id"){
+    if (mean_median == "mean"){
+      smoothModel = gam(Y.id.mean~s(Nlist),data=df.result)   
+    }else{
+      smoothModel = gam(Y.id.50~s(Nlist),data=df.result)   
+    }
+  }
+  # myNlist = seq(0,1000,length.out = 100)
+  pred.smoothModel = predict(smoothModel,newdata = data.frame(Nlist=myNlist),se=TRUE)
+  mfit.smoothModel = pred.smoothModel$fit
+  low.smoothModel = mfit.smoothModel - 1.96 * pred.smoothModel$se.fit
+  high.smoothModel = mfit.smoothModel + 1.96 * pred.smoothModel$se.fit
+  return(list(mfit.smoothModel,low.smoothModel,high.smoothModel))
+}
+ConstructDFPlot1 = function(df.result){
+  myNlist = seq(0,1000,length.out = 100)
+  mean_median = "mean"
+  globalModel = returnPred(df.result,"global",mean_median,myNlist)
+  idModel = returnPred(df.result,"id",mean_median,myNlist)
+  pluginModel = returnPred(df.result,"plugin",mean_median,myNlist)
+  
+  df.Plot = data.frame(Nlist = myNlist, 
+                       Y.global.50 = globalModel[[1]], 
+                       Y.global.25 = globalModel[[2]], 
+                       Y.global.75 = globalModel[[3]],
+                       Y.plugin.50 = pluginModel[[1]], 
+                       Y.plugin.25 = pluginModel[[2]], 
+                       Y.plugin.75 = pluginModel[[3]],
+                       Y.id.50 = idModel[[1]], 
+                       Y.id.25 = idModel[[2]], 
+                       Y.id.75 = idModel[[3]]
+                       )
+  return(df.Plot)
+}
+
+ComputeSD = function(df.result){
+  df.result = t(df.result)
+  df.result = df.result[c(2:nrow(df.result)),]
+  SDarray = rep(0,ncol(df.result))
+  for (colidx in 1:ncol(df.result)){
+    SDarray[colidx] = sd(df.result[,colidx],na.rm=T)
+  }
+  return(SDarray)
+}
+
+computeColMeans = function(df.result){
+  tmp = t(df.result)
+  return(colMeans(tmp[c(2:nrow(tmp)),],na.rm=T))
+}
+
+
+ConstructDFPlot2 = function(instancename, mean_median){
+  df.result.summary = read.csv(paste(instancename,'-summary.csv',sep=""))
+  df.result.global = read.csv(paste(instancename,'-global.csv',sep=""))
+  df.result.id = read.csv(paste(instancename,'-id.csv',sep=""))
+  df.result.plugin = read.csv(paste(instancename,'-param.csv',sep=""))
+  
+  confidence_coef = 1/5
+  
+  if (mean_median == "median"){
+    globalCenter = df.result.summary$Y.global.50
+    idCenter = df.result.summary$Y.id.50
+    pluginCenter = df.result.summary$Y.plugin.50
+  }else{
+    globalCenter = df.result.summary$Y.global.mean
+    idCenter = df.result.summary$Y.id.mean
+    pluginCenter = computeColMeans(df.result.plugin)
+  }
+  globalSD = ComputeSD(df.result.global)
+  globalLow = globalCenter - confidence_coef*globalSD
+  globalHigh = globalCenter + confidence_coef*globalSD
+  
+  idSD = ComputeSD(df.result.id)
+  idLow = idCenter - confidence_coef*idSD
+  idHigh = idCenter + confidence_coef*idSD
+  
+  pluginSD = ComputeSD(df.result.plugin)
+  pluginLow = pluginCenter - confidence_coef*pluginSD
+  pluginHigh = pluginCenter + confidence_coef*pluginSD
+  
+  df.Plot = data.frame(Nlist = df.result.summary$Nlist, 
+                       Y.global.50 = globalCenter,
+                       Y.global.25 = globalLow,
+                       Y.global.75 = globalHigh,
+                       Y.plugin.50 = pluginCenter,
+                       Y.plugin.25 = pluginLow,
+                       Y.plugin.75 = pluginHigh,
+                       Y.id.50 = idCenter,
+                       Y.id.25 = idLow,
+                       Y.id.75 = idHigh
+  )
+  return(df.Plot)
+  
+  
+}
+
+# df.result = read.csv('Result/napkin-0802-1030-D20-summary.csv')
+# df.result = read.csv('Result/mediator-0804-0000-D20-summary.csv')
+# df.result = read.csv('Result/doubleeffect-0804-0000-D20-summary.csv')
+
+# df.result = ConstructDFPlot2('Result/napkin-0802-1030-D20','mean')
+# df.result = ConstructDFPlot2('Result/mediator-0804-0000-D20','mean')
+df.result = ConstructDFPlot2('Result/doubleeffect-0804-0000-D20','mean')
+
 
 # General 
-regmethod = 'loess'
-# ylimits = c(0.0,0.02)
+regmethod = 'auto'
+ylimits = c(0.0,0.1)
 # xlimits = c(0,5000)
 xlimits = c(0,max(df.result$Nlist))
-spanval = 1.0
+spanval = 1
 point_size = 3
 alpha_point = 1
 
 twoD = T
 medianTF = T
 
-# df.result = df.result[1:160,]
-# df.result = read.csv('genFD-0307-0323-1-40.csv')
-# df.result = df.result[1:40,]
+
 
 gg = ggplot(data = df.result, aes(x=Nlist))
+
 
 if(medianTF == T){
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.global.50,colour="Y.global.50"),size=1,method=regmethod,se=F, span=spanval)  
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.plugin.50"),size=1.5,method=regmethod,se=F, span=spanval,linetype='dashed')
-  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.heuristic.50,colour="Y.heuristic.50"),size=2,method=regmethod,se=F, span=spanval,linetype='dotdash')
+  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.heuristic.50,colour="Y.heuristic.50"),size=2,method=regmethod,se=F, span=spanval,linetype='dotdash')
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.id.50,colour="Y.id.50"),size=3,method=regmethod,se=F, span=spanval,linetype='dotted')
-  # gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.multi.25,ymax=Y.multi.75),alpha=0.2, fill="red")
+  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.global.25,ymax=Y.global.75),alpha=0.2, fill="dodgerblue")
   # gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.naive.25,ymax=Y.naive.75),alpha=0.1, fill="blue")
-  # gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.exact.25,ymax=Y.exact.75),alpha=0.2, fill="seagreen")
-  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.plugin.50"),size=1.5,method='gam',se=F,formula=y~s(x,k=10),)
+  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.id.25,ymax=Y.id.75),alpha=0.2, fill="orange")
+  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.plugin.25,ymax=Y.plugin.75),alpha=0.2, fill="firebrick1")
+  # gg = gg + geom_smooth(data=df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.plugin.50"),size=1.5,method='gam',se=F,formula=y~s(x,k=10),)
   gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.plugin.50,colour='Y.plugin.50'),size=point_size,alpha=alpha_point,shape=4)
   gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.global.50,colour='Y.global.50'),size=point_size,alpha=alpha_point,shape=16)
-  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.heuristic.50,colour='Y.heuristic.50'),size=point_size,alpha=alpha_point,shape=8)
+  # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.heuristic.50,colour='Y.heuristic.50'),size=point_size,alpha=alpha_point,shape=8)
   gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.id.50,colour='Y.id.50'),size=point_size,alpha=alpha_point,shape=9)
   if(twoD == F){
     gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.scale.50,colour="Y.scale.50"),size=1.5,method=regmethod,se=F,span=spanval)
     gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.scale.50"),values = c("gold", "red","seagreen"),labels=c("CWO","Naive","Weight-HD"))
     # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.scale.50,colour='Y.scale.50'),size=1.5,alpha=0.2)
   }else{
-    gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.heuristic.50","Y.id.50"),values = c("blue", "firebrick2","orange","purple"),labels=c("WERM-Global","Plug-In","WERM-ID-R","WERM-ID"))
+    gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.id.50"),values = c("blue", "firebrick2","orange"),labels=c("WERM-ID-R","Plug-In","WERM-ID"))
     # gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.heuristic.50","Y.id.50"),values = c("blue", "firebrick2","orange","darkgreen"),labels=c("WERM-ID-R-Global","Plug-in","WERM-ID-R-Heuristic","WERM-ID"))   
   }
   # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.global.50,colour='Y.global.50'),size=1.5,alpha=0.2)
@@ -192,8 +169,8 @@ if(medianTF == T){
 }else{
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.multi.mean,colour="Y.multi.mean"),size=1.5,method=regmethod,se=F, span=spanval)
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.naive.mean,colour="Y.naive.mean"),size=1.5,method=regmethod,se=F, span=spanval)
-  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.multi.25,ymax=Y.multi.75),alpha=0.25, fill="blue")
-  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.naive.25,ymax=Y.naive.75),alpha=0.25, fill="red")
+  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.multi.25,ymax=Y.multi.75),alpha=, fill="blue")
+  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.naive.25,ymax=Y.naive.75),alpha=0.05, fill="red")
   # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.naive.mean"),size=1.5,method='lm',se=F,formula=y~splines::bs(x,5),span=spanval)
   # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.multi.mean,colour='Y.multi.mean'),size=1.5,alpha=0.2)
   # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.naive.mean,colour='Y.naive.mean'),size=1.5,alpha=0.2)

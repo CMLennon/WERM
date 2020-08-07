@@ -8,3 +8,5 @@
 reproduce/parallelExample2.R
 reproduce/parallelExample.R
 *.txt
+*.key
+*.pdf
