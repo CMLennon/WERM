@@ -32,17 +32,17 @@ multiID = function(OBS,D,numCate){
   Prob.Z = Z * mean(Z) + (1-Z)*(1-mean(Z))
   
   # Learn P^{Wd}(y|w,z)
-  Ybox = rep(0,nrow(DATA))
-  bootstrap_iter = 20
-  for (idx in 1:bootstrap_iter){
-    sampled_df = WERM_Sampler(DATA,Prob.Z/Prob.Z.xw)
-    # Learn Pw(y|w,z)
-    model.Yw.wz = learnXG_mediator(sampled_df,c(1:D,(D+2)),Y,rep(0,length(X)))
-    pred.Yw.wz = predict(model.Yw.wz, newdata=data.matrix(data.frame(W,Z)),type='response')
-    Prob.Yw.wz = Y*pred.Yw.wz + (1-Y)*(1-pred.Yw.wz)
-    Ybox = Ybox + Prob.Yw.wz
-  }
-  Prob.Yw.wz = Ybox/bootstrap_iter
+  # Ybox = rep(0,nrow(DATA))
+  # bootstrap_iter = 20
+  # for (idx in 1:bootstrap_iter){
+  #   sampled_df = WERM_Sampler(DATA,Prob.Z/Prob.Z.xw)
+  #   # Learn Pw(y|w,z)
+  #   model.Yw.wz = learnXG_mediator(sampled_df,c(1:D,(D+2)),Y,rep(0,length(X)))
+  #   pred.Yw.wz = predict(model.Yw.wz, newdata=data.matrix(data.frame(W,Z)),type='response')
+  #   Prob.Yw.wz = Y*pred.Yw.wz + (1-Y)*(1-pred.Yw.wz)
+  #   Ybox = Ybox + Prob.Yw.wz
+  # }
+  
   
   # Learn P(y|w,x,z)
   model.Y.wxz = learnXG_mediator(DATA,c(1:(D+2)),Y,rep(0,length(Y)))
@@ -50,6 +50,7 @@ multiID = function(OBS,D,numCate){
   pred.Y.wx0z = predict(model.Y.wxz, newdata=data.matrix(data.frame(W,X=X0,Z)),type='response')
   pred.Y.wx1z = predict(model.Y.wxz, newdata=data.matrix(data.frame(W,X=X1,Z)),type='response')
   Prob.Y.wxz = Y*pred.Y.wxz + (1-Y)*(1-pred.Y.wxz)
+  Prob.Yw.wz = pred.Y.wx0z*Prob.X0.w + pred.Y.wx1z*Prob.X1.w
   
   # Compute \hat{W}
   W_importance = (Prob.Yw.wz * Prob.X)/(Prob.X.w * Prob.Y.wxz)
@@ -65,5 +66,6 @@ multiID = function(OBS,D,numCate){
   IDanswer = c(Yx0,Yx1)
   return(IDanswer)
 }
+  
 
 

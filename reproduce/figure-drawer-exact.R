@@ -5,56 +5,6 @@ library(mgcv)
 
 mise()
 
-returnPred = function(df.result,modelmode,mean_median,myNlist){
-  if (modelmode == "global"){
-    if (mean_median == "mean"){
-      smoothModel = gam(Y.global.mean~s(Nlist),data=df.result)   
-    }else{
-      smoothModel = gam(Y.global.50~s(Nlist),data=df.result)   
-    }
-  }
-  else if (modelmode == "plugin"){
-    if (mean_median == "mean"){
-      smoothModel = gam(Y.plugin.mean~s(Nlist),data=df.result)   
-    }else{
-      smoothModel = gam(Y.plugin.50~s(Nlist),data=df.result)   
-    }
-  }
-  else if (modelmode == "id"){
-    if (mean_median == "mean"){
-      smoothModel = gam(Y.id.mean~s(Nlist),data=df.result)   
-    }else{
-      smoothModel = gam(Y.id.50~s(Nlist),data=df.result)   
-    }
-  }
-  # myNlist = seq(0,1000,length.out = 100)
-  pred.smoothModel = predict(smoothModel,newdata = data.frame(Nlist=myNlist),se=TRUE)
-  mfit.smoothModel = pred.smoothModel$fit
-  low.smoothModel = mfit.smoothModel - 1.96 * pred.smoothModel$se.fit
-  high.smoothModel = mfit.smoothModel + 1.96 * pred.smoothModel$se.fit
-  return(list(mfit.smoothModel,low.smoothModel,high.smoothModel))
-}
-ConstructDFPlot1 = function(df.result){
-  myNlist = seq(0,1000,length.out = 100)
-  mean_median = "mean"
-  globalModel = returnPred(df.result,"global",mean_median,myNlist)
-  idModel = returnPred(df.result,"id",mean_median,myNlist)
-  pluginModel = returnPred(df.result,"plugin",mean_median,myNlist)
-  
-  df.Plot = data.frame(Nlist = myNlist, 
-                       Y.global.50 = globalModel[[1]], 
-                       Y.global.25 = globalModel[[2]], 
-                       Y.global.75 = globalModel[[3]],
-                       Y.plugin.50 = pluginModel[[1]], 
-                       Y.plugin.25 = pluginModel[[2]], 
-                       Y.plugin.75 = pluginModel[[3]],
-                       Y.id.50 = idModel[[1]], 
-                       Y.id.25 = idModel[[2]], 
-                       Y.id.75 = idModel[[3]]
-                       )
-  return(df.Plot)
-}
-
 ComputeSD = function(df.result){
   df.result = t(df.result)
   df.result = df.result[c(2:nrow(df.result)),]
@@ -70,12 +20,12 @@ computeColMeans = function(df.result){
   return(colMeans(tmp[c(2:nrow(tmp)),],na.rm=T))
 }
 
-
-ConstructDFPlot2 = function(instancename, mean_median){
+ConstructDFPlot = function(instancename,mean_median){
   df.result.summary = read.csv(paste(instancename,'-summary.csv',sep=""))
   df.result.global = read.csv(paste(instancename,'-global.csv',sep=""))
-  df.result.id = read.csv(paste(instancename,'-id.csv',sep=""))
+  df.result.id = read.csv(paste(instancename,'-bd.csv',sep=""))
   df.result.plugin = read.csv(paste(instancename,'-param.csv',sep=""))
+  # df.result.IPW = read.csv(paste(instancename,'-ipw.csv',sep=""))
   
   confidence_coef = 1/5
   
@@ -83,10 +33,12 @@ ConstructDFPlot2 = function(instancename, mean_median){
     globalCenter = df.result.summary$Y.global.50
     idCenter = df.result.summary$Y.id.50
     pluginCenter = df.result.summary$Y.plugin.50
+    # ipwCenter = df.result.summary$Y.ipw.50
   }else{
     globalCenter = df.result.summary$Y.global.mean
     idCenter = df.result.summary$Y.id.mean
     pluginCenter = computeColMeans(df.result.plugin)
+    # ipwCenter = df.result.summary$Y.ipw.mean
   }
   globalSD = ComputeSD(df.result.global)
   globalLow = globalCenter - confidence_coef*globalSD
@@ -100,6 +52,10 @@ ConstructDFPlot2 = function(instancename, mean_median){
   pluginLow = pluginCenter - confidence_coef*pluginSD
   pluginHigh = pluginCenter + confidence_coef*pluginSD
   
+  # ipwSD = ComputeSD(df.result.IPW)
+  # ipwLow = ipwCenter - confidence_coef*ipwSD
+  # ipwHigh = ipwCenter + confidence_coef*ipwSD
+  
   df.Plot = data.frame(Nlist = df.result.summary$Nlist, 
                        Y.global.50 = globalCenter,
                        Y.global.25 = globalLow,
@@ -110,20 +66,23 @@ ConstructDFPlot2 = function(instancename, mean_median){
                        Y.id.50 = idCenter,
                        Y.id.25 = idLow,
                        Y.id.75 = idHigh
+                       # Y.ipw.50 = ipwCenter,
+                       # Y.ipw.25 = ipwLow,
+                       # Y.ipw.75 = ipwHigh
   )
   return(df.Plot)
-  
-  
 }
 
-# df.result = read.csv('Result/napkin-0802-1030-D20-summary.csv')
-# df.result = read.csv('Result/mediator-0804-0000-D20-summary.csv')
-# df.result = read.csv('Result/doubleeffect-0804-0000-D20-summary.csv')
 
-# df.result = ConstructDFPlot2('Result/napkin-0802-1030-D20','mean')
-# df.result = ConstructDFPlot2('Result/mediator-0804-0000-D20','mean')
-df.result = ConstructDFPlot2('Result/doubleeffect-0804-0000-D20','mean')
+# instancename = 'Result/napkin-0802-1030-D20'
+# instancename = 'Result/mediator-0804-0000-D20'
+# instancename = 'Result/doubleeffect-0804-0000-D20'
+instancename = 'Result/doubleeffect-0811-0200-D15'
+# instancename = 'Result/doubleeffect-0811-1300-D15'
 
+df.result = ConstructDFPlot(instancename,'mean')
+# df.result = ConstructDFPlot('Result/mediator-0804-0000-D20','mean')
+# df.result = ConstructDFPlot('Result/doubleeffect-0804-0000-D20','mean')
 
 # General 
 regmethod = 'auto'
@@ -137,32 +96,30 @@ alpha_point = 1
 twoD = T
 medianTF = T
 
-
-
 gg = ggplot(data = df.result, aes(x=Nlist))
 
 
 if(medianTF == T){
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.global.50,colour="Y.global.50"),size=1,method=regmethod,se=F, span=spanval)  
   gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.plugin.50"),size=1.5,method=regmethod,se=F, span=spanval,linetype='dashed')
-  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.heuristic.50,colour="Y.heuristic.50"),size=2,method=regmethod,se=F, span=spanval,linetype='dotdash')
-  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.id.50,colour="Y.id.50"),size=3,method=regmethod,se=F, span=spanval,linetype='dotted')
+  # gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.ipw.50,colour="Y.ipw.50"),size=2,method=regmethod,se=F, span=spanval,linetype='dotdash')
+  gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.id.50,colour="Y.id.50"),size=1.5,method=regmethod,se=F, span=spanval,linetype='longdash')
   gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.global.25,ymax=Y.global.75),alpha=0.2, fill="dodgerblue")
-  # gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.naive.25,ymax=Y.naive.75),alpha=0.1, fill="blue")
-  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.id.25,ymax=Y.id.75),alpha=0.2, fill="orange")
+  # gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.ipw.25,ymax=Y.ipw.75),alpha=0.1, fill="orange")
+  gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.id.25,ymax=Y.id.75),alpha=0.2, fill="seagreen")
   gg = gg + geom_ribbon(data=df.result, aes(x=Nlist, ymin=Y.plugin.25,ymax=Y.plugin.75),alpha=0.2, fill="firebrick1")
   # gg = gg + geom_smooth(data=df.result, aes(x=Nlist,y=Y.plugin.50,colour="Y.plugin.50"),size=1.5,method='gam',se=F,formula=y~s(x,k=10),)
   gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.plugin.50,colour='Y.plugin.50'),size=point_size,alpha=alpha_point,shape=4)
   gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.global.50,colour='Y.global.50'),size=point_size,alpha=alpha_point,shape=16)
-  # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.heuristic.50,colour='Y.heuristic.50'),size=point_size,alpha=alpha_point,shape=8)
-  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.id.50,colour='Y.id.50'),size=point_size,alpha=alpha_point,shape=9)
+  # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.ipw.50,colour='Y.ipw.50'),size=point_size,alpha=alpha_point,shape=6)
+  gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.id.50,colour='Y.id.50'),size=point_size,alpha=alpha_point,shape=8)
   if(twoD == F){
     gg = gg + geom_smooth(data = df.result, aes(x=Nlist,y=Y.scale.50,colour="Y.scale.50"),size=1.5,method=regmethod,se=F,span=spanval)
     gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.scale.50"),values = c("gold", "red","seagreen"),labels=c("CWO","Naive","Weight-HD"))
     # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.scale.50,colour='Y.scale.50'),size=1.5,alpha=0.2)
   }else{
-    gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.id.50"),values = c("blue", "firebrick2","orange"),labels=c("WERM-ID-R","Plug-In","WERM-ID"))
-    # gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.heuristic.50","Y.id.50"),values = c("blue", "firebrick2","orange","darkgreen"),labels=c("WERM-ID-R-Global","Plug-in","WERM-ID-R-Heuristic","WERM-ID"))   
+    # gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.id.50","Y.ipw.50"),values = c("blue", "firebrick2","seagreen","orange"),labels=c("WERM-ID-R","Plug-In","PO-Regression","PO-IPW"))
+    gg = gg + scale_color_manual("",breaks=c("Y.global.50","Y.plugin.50","Y.id.50"),values = c("blue", "firebrick2","seagreen"),labels=c("WERM-ID-R","Plug-In","PO-framework"))
   }
   # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.global.50,colour='Y.global.50'),size=1.5,alpha=0.2)
   # gg = gg + geom_point(data=df.result,aes(x=Nlist,y=Y.plugin.50,colour='Y.plugin.50'),size=1.5,alpha=0.2)

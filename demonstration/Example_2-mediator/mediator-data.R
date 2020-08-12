@@ -36,8 +36,8 @@ dataGen = function(seednum,N,Nintv,D,C){
     Wmat = as.matrix(2*W-1)
     cxmat = as.matrix(cx)
     Wval = inv.logit(Wmat %*% cxmat)
-    X = round(inv.logit(-1*Wval + Ux - U1 + U3 ))
-    # X = rbinom(N,size=1,inv.logit(-1*Wval - 2*U1 + 0.5*U3*Wval + Ux - 2*U1*U3 ))
+    # X = round(inv.logit(-1*Wval + Ux - U1 + U3 ))
+    X = rbinom(N,size=1,inv.logit(-1*Wval - 2*U1 + 0.5*U3*Wval + Ux - 2*U1*U3 ))
     return(X)
   }
   fZ = function(N,W,X){
@@ -45,9 +45,9 @@ dataGen = function(seednum,N,Nintv,D,C){
     Wmat = as.matrix(2*W-1)
     czmat = as.matrix(cz)
     Wval = inv.logit(Wmat %*% czmat)
-    Z = rbinom(N,size=1,inv.logit(1*Wval - 2*(2*X-1) + Uz ))
+    # Z = rbinom(N,size=1,inv.logit(1*Wval - 2*(2*X-1) + Uz ))
     # X = rbinom(N,size=1,inv.logit(1*U1 - 2*Z + Ux ))
-    # Z = rbinom(N,size=1,inv.logit((1*Wval*(2*X-1) - 2*(2*X-1) )**2+ Uz -2  ))
+    Z = rbinom(N,size=1,inv.logit((1*Wval*(2*X-1) - 2*(2*X-1) )**2+ Uz -2  ))
     return(Z)
   }
   fY = function(N,U2,U3,Z,W){

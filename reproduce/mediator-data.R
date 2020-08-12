@@ -1,6 +1,14 @@
 # library(boot)
 # library(ipw)
 
+myXOR = function(W){
+  myval = xor(W[,2],W[,1])
+  for(idx in 3:(ncol(W))){
+    myval = xor(myval,W[,idx])
+  }
+  return(myval)
+}
+
 dataGen = function(seednum,N,Nintv,D,C){
   # W should be high dim 
   
@@ -36,8 +44,9 @@ dataGen = function(seednum,N,Nintv,D,C){
     Wmat = as.matrix(2*W-1)
     cxmat = as.matrix(cx)
     Wval = inv.logit(Wmat %*% cxmat)
-    X = round(inv.logit(-1*Wval + Ux - U1 + U3 ))
-    # X = rbinom(N,size=1,inv.logit(-1*Wval - 2*U1 + 0.5*U3*Wval + Ux - 2*U1*U3 ))
+    # Wval = myXOR(W)
+    # X = round(inv.logit(-1*Wval + Ux - U1 + U3 ))
+    X = rbinom(N,size=1,inv.logit(-1*Wval - 2*U1 + 0.5*U3*Wval + Ux - 2*U1*U3 ))
     return(X)
   }
   fZ = function(N,W,X){
@@ -45,6 +54,7 @@ dataGen = function(seednum,N,Nintv,D,C){
     Wmat = as.matrix(2*W-1)
     czmat = as.matrix(cz)
     Wval = inv.logit(Wmat %*% czmat)
+    # Wval = myXOR(W)
     Z = rbinom(N,size=1,inv.logit(1*Wval - 2*(2*X-1) + Uz ))
     # X = rbinom(N,size=1,inv.logit(1*U1 - 2*Z + Ux ))
     # Z = rbinom(N,size=1,inv.logit((1*Wval*(2*X-1) - 2*(2*X-1) )**2+ Uz -2  ))
@@ -52,11 +62,15 @@ dataGen = function(seednum,N,Nintv,D,C){
   }
   fY = function(N,U2,U3,Z,W){
     Uy = rnorm(N,0,0.5)
-    Wmat = as.matrix(2*W-1)
-    cymat = as.matrix(cy)
-    Wval = inv.logit(Wmat %*% cymat)
-    Y = rbinom(N,size=1,inv.logit(-(0.5*U2 -0.8*U3)**2 + 2*log(abs((2*Z-1)*Wval)+1)- U3*U2))
-    # Y = rbinom(N,size=1,inv.logit(-U3-U2+Z-Wval+1))
+    # Wmat = as.matrix(2*W-1)
+    # cymat = as.matrix(cy)
+    # Wval = inv.logit(Wmat %*% cymat)
+    Wval = myXOR(W)
+    # Y = rbinom(N,size=1,inv.logit(-(0.5*U2 -0.8*U3)**2 + 2*log(abs((2*Z-1)*Wval)+1)- U3*U2 - 8*Wval^2))
+    # Y = -(0.5*U2 -0.8*U3)**2 + 2*log(abs((2*Z-1)*Wval)+1)- U3*U2 - 8*Wval
+    # Y = (max(Y)-Y)/(max(Y)-min(Y))
+    Y = rbinom(N,size=1,inv.logit(-U3-U2+Z-10*Wval+1))
+    # Y = inv.logit(-U3-U2+Z-10*Wval+1)
     return(Y)
   }
   

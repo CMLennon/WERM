@@ -6,6 +6,8 @@ source('mediator-est-global.R')
 source('mediator-param.R')
 source('mediator-est-heuristic.R')
 source('mediator-est-ID.R')
+source('mediator-as-BD.R')
+source('mediator-as-IPW.R')
 
 N = 1000
 Nintv = 1000000
@@ -26,15 +28,19 @@ WERManswer = multiHeuristic(OBS,D,numCate)
 PLUGINanswer = PlugInEstimator(OBS,D,numCate)
 IDanswer = multiID(OBS,D,numCate)
 GLOBALanswer = multiGlobal(OBS,D,numCate)
+asBDanswer = asBDEstimator(OBS,D,numCate)
+asIPWanswer = asIPWEstimator(OBS,D,numCate)
 
 WERMperformance = mean(abs(WERManswer-answer))
 GLOBALperformance = mean(abs(GLOBALanswer-answer))
 PLUGINperformance = mean(abs(PLUGINanswer-answer))
 IDperformance = mean(abs(IDanswer-answer))
+asBDperofrmance = mean(abs(asBDanswer-answer))
+asIPWperformance = mean(abs(asIPWanswer-answer))
 
-resultArray = c(PLUGINperformance,GLOBALperformance,WERMperformance,IDperformance)
-resultTbl = matrix(round(resultArray,3),ncol=4)
-colnames(resultTbl) = c("PlugIn","Global","WERM","ID")
+resultArray = c(PLUGINperformance,GLOBALperformance,WERMperformance,IDperformance,asBDperofrmance,asIPWperformance)
+resultTbl = matrix(round(resultArray,3),ncol=6)
+colnames(resultTbl) = c("PlugIn","Global","WERM","ID","BD","IPW")
 rownames(resultTbl) = "Error"
 print(resultTbl)
 print(paste("Winner:",colnames(resultTbl)[which.min(resultArray)]))

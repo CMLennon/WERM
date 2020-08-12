@@ -113,32 +113,23 @@ PlugInEstimator = function(OBS,D){
   ################################################################################
   # Evaluate 
   ################################################################################
-  allpossibleOrig = allpossible
-
-  ComputeVal = allpossible
-  ComputeVal$val1 = Ytable$prob * Xtable$prob * Wtable$prob
-  ComputeVal$val2 = Xtable$prob * Wtable$prob
+  # allpossibleOrig = allpossible
+  allpossible[,'val1'] = allpossible[,'prob.Y'] * allpossible[,'prob.X.ZW'] * allpossible[,'prob.W']
+  allpossible[,'val2'] = allpossible[,'prob.X.ZW'] * allpossible[,'prob.W']
   
-  ## Marginalizing over W
-  tmp = c()
-  tmp = append(tmp, list(c(0:1))) # R
-  tmp = append(tmp,list(c(0,1))) # X
-  allpossible = expand.grid(tmp)
-  colnames(allpossible) = c('R','X')
-  ComputeVal.MarginW = allpossible
-  ComputeVal.MarginW$val1 = 0
-  ComputeVal.MarginW$val2 = 0
-  
-  for (rval in (0:1)){
-    for(xval in (0:1)){
-      ComputeVal.MarginW[ComputeVal.MarginW$R==rval & ComputeVal.MarginW$X==xval,'val1'] = sum(ComputeVal[ComputeVal$X==xval & ComputeVal$R==rval,'val1'],na.rm=T)
-      ComputeVal.MarginW[ComputeVal.MarginW$R==rval & ComputeVal.MarginW$X==xval,'val2'] = sum(ComputeVal[ComputeVal$X==xval & ComputeVal$R==rval,'val2'],na.rm=T)
+  prob.XY.do.R = rep(0,4)
+  prob.X.do.R = rep(0,4)
+  idx = 1 
+  for (xval in (0:1)){
+    for(rval in (0:1)){
+      prob.XY.do.R[idx] = sum(allpossible[allpossible$X==xval & allpossible$R == rval, 'val1'],na.rm=T) 
+      prob.X.do.R[idx] = sum(allpossible[allpossible$X==xval & allpossible$R == rval, 'val2'],na.rm=T) 
+      idx = idx + 1 
     }
   }
-  ComputeVal.MarginW$val3 = exp(log(ComputeVal.MarginW$val1) - log(ComputeVal.MarginW$val2))
-  
-  Yx0 = mean(ComputeVal.MarginW[ComputeVal.MarginW$X==0,'val3'],na.rm = T)
-  Yx1 = mean(ComputeVal.MarginW[ComputeVal.MarginW$X==1,'val3'],na.rm = T)
+  cand.prob.Y.do.X = exp(log(prob.XY.do.R) - log(prob.X.do.R))
+  Yx0 = mean(cand.prob.Y.do.X[c(1:2)])
+  Yx1 = mean(cand.prob.Y.do.X[c(3:4)])
 
   return(c(Yx0,Yx1))
 }

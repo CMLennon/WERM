@@ -1,7 +1,7 @@
 source('../WERM_Heuristic.R')
 
 # A function for estimating \hat{W*}. This function is dependent on the graph. 
-ComputeSW.lowhigh = function(outVar.train, inVar.train, outVar.eval, inVar.eval, outputname){
+myComputeSW.lowhigh = function(outVar.train, inVar.train, outVar.eval, inVar.eval, outputname){
   # Compute P(outputVal|inputVal1,...,inputValD)
   inVar_margin = data.matrix(rep(1,length(outVar.train)))
   model_xgboost = xgboost(verbose = 0, data = data.matrix(inVar.train), label = outVar.train, nrounds = 20,max.depth=10,lambda=1/length(outVar.train),alpha=1/length(outVar.train), objective = "binary:logistic")
@@ -44,7 +44,10 @@ WERMEstimator = function(OBS,D){
     ################################################################
     # \hat{W*}. Suppose we assume this is given. 
     ################################################################
-    SW_importance_sampling  = ComputeSW.lowhigh(Ztrain,Wtrain,Zeval,Weval,'Z') 
+    SW_importance_sampling  = myComputeSW.lowhigh(outVar.train = Ztrain,
+                                                inVar.train = Wtrain,
+                                                outVar.eval = Zeval,
+                                                inVar.eval = Weval, outputname = 'Z') 
 
     ################################################################
     # Learn h and W.
