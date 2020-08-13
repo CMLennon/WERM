@@ -23,7 +23,7 @@ computePerformance_Double = function(OBS,answer,prediction){
   return(sum(abs(answer-prediction)*proportion_X,na.rm=T))
 }
 
-N = 10000
+N = 100000
 Nintv = 5000000
 
 D = 2
@@ -55,21 +55,20 @@ WERManswer = multiHeuristic(OBS,D,numCate)
 # GLOBALanswer = multiGlobal(OBS,D,numCate)
 GLOBALanswer = WERManswer
 BDanswer = asBDEstimator(OBS,D,numCate)
-IPWanswer = asIPWEstimator(OBS,D,numCate)
+# asIPWanswer = asIPWEstimator(OBS,D,numCate)
 
 WERMperformance = mean(abs(WERManswer - answer))
 GLOBALperformance = mean(abs(GLOBALanswer - answer))
 BDperformance = mean(abs(BDanswer - answer))
-IPWperformance = mean(abs(IPWanswer - answer))
 
 # WERMperformance = computePerformance_Double(OBS,answer,WERManswer)
 # GLOBALperformance = computePerformance_Double(OBS,answer,GLOBALanswer)
 # asBDperformance = computePerformance_Double(OBS,answer,asBDanswer)
 # 
 # # resultArray = c(PLUGINperformance,GLOBALperformance,WERMperformance,IDperformance,asBDperformance,asIPWperformance)
-resultArray = c(GLOBALperformance,WERMperformance,BDperformance,IPWperformance)
-resultTbl = matrix(round(resultArray,3),ncol=4)
-colnames(resultTbl) = c("Global","WERM","BD","IPW")
+resultArray = c(GLOBALperformance,WERMperformance,BDperformance)
+resultTbl = matrix(round(resultArray,3),ncol=3)
+colnames(resultTbl) = c("Global","WERM","BD")
 rownames(resultTbl) = "Error"
 print(resultTbl)
 print(paste("Winner:",colnames(resultTbl)[which.min(resultArray)]))

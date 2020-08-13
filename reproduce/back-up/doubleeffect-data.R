@@ -47,8 +47,8 @@ dataGen = function(seednum,N,Nintv,D,C){
     Uw = rnorm(N,0,0.5)
     W = matrix(0,ncol=D,nrow=N)
     for (idx in 1:D){
-      W[,idx] = rbinom(N,size=1,prob=inv.logit(c.w.1[idx]*U1+c.w.2[idx]*U2 + Uw))
-      # W[,idx] = c.w.1[idx]*U1+c.w.2[idx]*U2 + Uw
+      # W[,idx] = rbinom(N,size=1,prob=inv.logit(c.w.1[idx]*U1+c.w.2[idx]*U2 + Uw))
+      W[,idx] = c.w.1[idx]*U1+c.w.2[idx]*U2 + Uw
     }
     W = data.frame(W)
     colnames(W) = paste('W',1:D,sep="")
@@ -102,8 +102,8 @@ dataGen = function(seednum,N,Nintv,D,C){
   fY = function(N,R,Z,U2,U3){
     Uy = rnorm(N,0,0.5)
     Y = rbinom(N,size=1,inv.logit(-1*(2*R-1)*Z + 0.5*(2*Z-1)*log(abs(U2*U3)+1) - R*U2- Uy +1))
-    # Y = -1*(2*R-1)*Z + 0.5*(2*Z-1)*log(abs(U2*U3)+1) - R*U2- Uy +1
-    # Y = (Y-min(Y))/(max(Y)-min(Y))
+    Y = -1*(2*R-1)*Z + 0.5*(2*Z-1)*log(abs(U2*U3)+1) - R*U2- Uy +1
+    Y = (Y-min(Y))/(max(Y)-min(Y))
     # Y = rbinom(N,size=1,inv.logit(R*Z*U2*U3-1))
     return(Y)
   }

@@ -86,6 +86,7 @@ if(probleminstance == 'mediator'){
 if(probleminstance == 'doubleeffect'){
   source('doubleeffect-data.R')
   source('doubleeffect-as-BD.R')
+  source('doubleeffect-as-IPW.R')
   source('doubleeffect-est-global.R')
   source('doubleeffect-param.R')
   source('doubleeffect-est-heuristic.R')
