@@ -12,6 +12,7 @@ multiHeuristic = function(OBS,D,numCate){
   Z = OBS[,(D+3)]  
   Y = OBS[,(D+4)]
   DATA = data.frame(W,X,R,Z,Y)
+  myYbinary = 0
   
   ################################################################
   # Evaluate the weight hat{W}
@@ -73,7 +74,8 @@ multiHeuristic = function(OBS,D,numCate){
   pred.Y.wxrz = predict(model.Y.wxrz, newdata=data.matrix(data.frame(W=W,X=X,R=R,Z=Z)),type='response')
   pred.Y.wx0rz = predict(model.Y.wxrz, newdata=data.matrix(data.frame(W=W,X=X0,R=R,Z=Z)),type='response')
   pred.Y.wx1rz = predict(model.Y.wxrz, newdata=data.matrix(data.frame(W=W,X=X1,R=R,Z=Z)),type='response')
-  Prob.Y.wxrz = Y*pred.Y.wxrz + (1-Y)*(1-pred.Y.wxrz)
+  # Prob.Y.wxrz = Y*pred.Y.wxrz + (1-Y)*(1-pred.Y.wxrz)
+  Prob.Y.wxrz = pred.Y.wx1rz
   
   # Compute \hat{W}
   W_importance = (Prob.X* Prob.R * Prob.Z.wx *  (Prob.X0.w*pred.Y.wx0rz + Prob.X1.w*pred.Y.wx1rz))/(Prob.X.w * Prob.R.w * Prob.Z.wxr * Prob.Y.wxrz)
@@ -86,10 +88,10 @@ multiHeuristic = function(OBS,D,numCate){
   X1R0 = data.matrix(data.frame(X=rep(1,nrow(DATA)),R=rep(0,nrow(DATA))))
   X1R1 = data.matrix(data.frame(X=rep(1,nrow(DATA)),R=rep(1,nrow(DATA))))
   
-  Yx0r0 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(0,nrow(DATA)),R=rep(0,nrow(DATA))), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)  
-  Yx0r1 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(0,nrow(DATA)),R=rep(1,nrow(DATA))), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)  
-  Yx1r0 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(1,nrow(DATA)),R=rep(0,nrow(DATA))), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)  
-  Yx1r1 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(1,nrow(DATA)),R=rep(1,nrow(DATA))), Y = Y, Ybinary = 1, lambda_h = lambda_h, learned_W= learned_W)  
+  Yx0r0 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(0,nrow(DATA)),R=rep(0,nrow(DATA))), Y = Y, Ybinary = myYbinary, lambda_h = lambda_h, learned_W= learned_W)  
+  Yx0r1 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(0,nrow(DATA)),R=rep(1,nrow(DATA))), Y = Y, Ybinary = myYbinary, lambda_h = lambda_h, learned_W= learned_W)  
+  Yx1r0 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(1,nrow(DATA)),R=rep(0,nrow(DATA))), Y = Y, Ybinary = myYbinary, lambda_h = lambda_h, learned_W= learned_W)  
+  Yx1r1 = WERM_Heuristic(inVar_train = data.frame(X=X, R=R), inVar_eval = data.frame(X=rep(1,nrow(DATA)),R=rep(1,nrow(DATA))), Y = Y, Ybinary = myYbinary, lambda_h = lambda_h, learned_W= learned_W)  
   
   WERManswer = c(Yx0r0,Yx0r1,Yx1r0,Yx1r1)
   return(WERManswer)

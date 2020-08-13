@@ -47,7 +47,8 @@ dataGen = function(seednum,N,Nintv,D,C){
     Uw = rnorm(N,0,0.5)
     W = matrix(0,ncol=D,nrow=N)
     for (idx in 1:D){
-      W[,idx] = rbinom(N,size=1,prob=inv.logit(c.w.1[idx]*U1+c.w.2[idx]*U2 + Uw))
+      # W[,idx] = rbinom(N,size=1,prob=inv.logit(c.w.1[idx]*U1+c.w.2[idx]*U2 + Uw))
+      W[,idx] = c.w.1[idx]*U1+c.w.2[idx]*U2 + Uw
     }
     W = data.frame(W)
     colnames(W) = paste('W',1:D,sep="")
@@ -63,8 +64,8 @@ dataGen = function(seednum,N,Nintv,D,C){
     cxmat = as.matrix(cx)
     Wval = inv.logit(Wmat %*% cxmat)
     # Wval = myXOR(W)
-    X = rbinom(N,size=1,inv.logit(-1*Wval + -0.5*U1 - 0.2*U3 + Ux-2 ))
-    # X = rbinom(N,size=1,inv.logit(-1*Wval*U1 + -0.5*U1 - 0.2*U3*U1 + Ux-2 ))
+    # X = rbinom(N,size=1,inv.logit(-1*Wval + -0.5*U1 - 0.2*U3 + Ux-2 ))
+    X = rbinom(N,size=1,inv.logit(-5*Wval*U1 + -0.5*U1 - 0.2*U3*U1 + Ux-2 ))
     return(X)
   }
   
@@ -77,7 +78,7 @@ dataGen = function(seednum,N,Nintv,D,C){
     crmat = as.matrix(cr)
     Wval = inv.logit(Wmat %*% crmat)
     # Wval = myXOR(W)
-    R = rbinom(N,size=1,inv.logit(-1*Wval - 1.2*U4 + Ur - 2))
+    R = rbinom(N,size=1,inv.logit(-10*Wval - 1.2*U4*Wval + Ur - 2))
     return(R)
   }
   
@@ -90,7 +91,7 @@ dataGen = function(seednum,N,Nintv,D,C){
     czmat = as.matrix(cz)
     Wval = inv.logit(Wmat %*% czmat)
     # Wval = myXOR(W)
-    Z = rbinom(N,size=1,inv.logit(0.5*Wval+U4 + 0.5*(2*X-1) - 0.9*(2*R-1) + Uz-1 - log(abs(Wval)+1) ))
+    Z = rbinom(N,size=1,inv.logit(0.5*Wval+U4 + 5*(2*X-1) - 9*(2*R-1) + Uz-1 - log(abs(Wval)+1) ))
     # Z = rbinom(N,size=1,inv.logit(0.5*Wval+U4 + 0.5*(2*X-1) - 0.9*(2*R-1) + Uz-1 ))
     return(Z)
   }
@@ -100,7 +101,11 @@ dataGen = function(seednum,N,Nintv,D,C){
   ################################################################################
   fY = function(N,R,Z,U2,U3){
     Uy = rnorm(N,0,0.5)
-    Y = rbinom(N,size=1,inv.logit(-1*(2*R-1)*Z + 0.5*(2*Z-1)*log(abs(U2*U3)+1) - R*U2- Uy +1))
+    # Y = rbinom(N,size=1,inv.logit(-1*(2*R-1)*Z + 0.5*(2*Z-1)*log(abs(U2*U3)+1) - 3*R*U2- Uy +1))
+    Y = 5*(2*R-1)*Z + 0.5*(2*Z-1)*log(abs(U2*U3)+1) - 10*R*U2- Uy +1
+    # Y = rbinom(N,size=1,Y)
+    # Y = (Y > 0.5)*1
+    Y = (Y - min(Y))/(max(Y)-min(Y))
     # Y = rbinom(N,size=1,inv.logit(R*Z*U2*U3-1))
     return(Y)
   }

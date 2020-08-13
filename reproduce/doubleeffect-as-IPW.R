@@ -21,8 +21,11 @@ asIPWEstimator = function(OBS,D,numCate){
   # Compute E[Y|x,z,w]
   ################################################################
   model.X = learnXG(inVar = data.matrix(data.frame(W=W, Z=Z)),labelval = X, regval = rep(0,nrow(DATA)))
+  model.R = learnXG(inVar = data.matrix(data.frame(W=W, Z=Z)),labelval = R, regval = rep(0,nrow(DATA)))
   pred.X = predict(model.X, newdata = data.matrix(data.frame(W=W, Z=Z)),type='response')
+  pred.R = predict(model.R, newdata = data.matrix(data.frame(W=W, Z=Z)),type='response')
   prob.X = mean(X)*pred.X + (1-mean(X))*pred.X
+  prob.R = mean(R)*pred.R + (1-mean(R))*pred.R
   
   Ix0r0 = ((X==0)*1)*((R==0)*1)
   Ix0r1 = ((X==0)*1)*((R==1)*1)
@@ -32,10 +35,15 @@ asIPWEstimator = function(OBS,D,numCate){
   ################################################################
   # Predict
   ################################################################
-  pred.X0R0 = fix_answer(mean((Y*Ix0r0)/prob.X,na.rm=T))
-  pred.X0R1 = fix_answer(mean((Y*Ix0r1)/prob.X,na.rm=T))
-  pred.X1R0 = fix_answer(mean((Y*Ix1r0)/prob.X,na.rm=T))
-  pred.X1R1 = fix_answer(mean((Y*Ix1r1)/prob.X,na.rm=T))
+  # pred.X0R0 = fix_answer(mean((Y*Ix0r0)/(prob.X*prob.R),na.rm=T))
+  # pred.X0R1 = fix_answer(mean((Y*Ix0r1)/(prob.X*prob.R),na.rm=T))
+  # pred.X1R0 = fix_answer(mean((Y*Ix1r0)/(prob.X*prob.R),na.rm=T))
+  # pred.X1R1 = fix_answer(mean((Y*Ix1r1)/(prob.X*prob.R),na.rm=T))
+  
+  pred.X0R0 = mean((Y*Ix0r0)/(prob.X*prob.R),na.rm=T)
+  pred.X0R1 = mean((Y*Ix0r1)/(prob.X*prob.R),na.rm=T)
+  pred.X1R0 = mean((Y*Ix1r0)/(prob.X*prob.R),na.rm=T)
+  pred.X1R1 = mean((Y*Ix1r1)/(prob.X*prob.R),na.rm=T)
   
   
   return(c(mean(pred.X0R0),mean(pred.X0R1),

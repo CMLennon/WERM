@@ -25,10 +25,10 @@ asBDEstimator = function(OBS,D,numCate){
   ################################################################
   # Predict
   ################################################################
-  pred.X0R0 = predict(model.Y, newdata=data.matrix(DATA.X0R0),type='response')
-  pred.X0R1 = predict(model.Y, newdata=data.matrix(DATA.X0R1),type='response')
-  pred.X1R0 = predict(model.Y, newdata=data.matrix(DATA.X1R0),type='response')
-  pred.X1R1 = predict(model.Y, newdata=data.matrix(DATA.X1R1),type='response')
+  pred.X0R0 = predict(model.Y, newdata=data.matrix(DATA.X0R0),type='predict')
+  pred.X0R1 = predict(model.Y, newdata=data.matrix(DATA.X0R1),type='predict')
+  pred.X1R0 = predict(model.Y, newdata=data.matrix(DATA.X1R0),type='predict')
+  pred.X1R1 = predict(model.Y, newdata=data.matrix(DATA.X1R1),type='predict')
   
   
   return(c(mean(pred.X0R0),mean(pred.X0R1),

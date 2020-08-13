@@ -80,61 +80,67 @@ learnXG = function(inVar,labelval,regval){
     # learnt XGboost model 
   ############################
   # regval = ((max(labelval) - min(labelval))**1)/nrow(data_sampled)
-  model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
-  return(model_XG)
-}
-
-learnXG_Planid = function(sampled_df,inVarCol,labelval,regval){
-  ############################
-  # Objective
-    # Learn XGBoost model 
-  # Input 
-    # sampled df: data 
-    # inVarCol: Column index for the input 
-    # labelval: Label
-    # regval: Hyperparameter lambda h
-  # Output 
-    # learnt XGboost model 
-  ############################
-
-  W = sampled_df[,1:D] 
-  X = sampled_df[,(D+1)]
-  R = sampled_df[,(D+2)]  
-  Z = sampled_df[,(D+3)]  
-  Y = sampled_df[,(D+4)]
-  data_sampled = data.frame(W,X,R,Z,Y)
+  if (length(unique(labelval)) == 2){
+    # print("ho")
+    model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2, objective = "binary:logistic")
+  }else{
+    model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)  
+  }
   
-  inVar = as.matrix(data_sampled[,inVarCol])
-  # regval = ((max(labelval) - min(labelval))**1)/nrow(data_sampled)
-  model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
   return(model_XG)
 }
 
+# learnXG_Planid = function(sampled_df,inVarCol,labelval,regval){
+#   ############################
+#   # Objective
+#     # Learn XGBoost model 
+#   # Input 
+#     # sampled df: data 
+#     # inVarCol: Column index for the input 
+#     # labelval: Label
+#     # regval: Hyperparameter lambda h
+#   # Output 
+#     # learnt XGboost model 
+#   ############################
+# 
+#   W = sampled_df[,1:D] 
+#   X = sampled_df[,(D+1)]
+#   R = sampled_df[,(D+2)]  
+#   Z = sampled_df[,(D+3)]  
+#   Y = sampled_df[,(D+4)]
+#   data_sampled = data.frame(W,X,R,Z,Y)
+#   
+#   inVar = as.matrix(data_sampled[,inVarCol])
+#   # regval = ((max(labelval) - min(labelval))**1)/nrow(data_sampled)
+#   model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
+#   return(model_XG)
+# }
 
-learnXG_mediator = function(sampled_df,inVarCol,labelval,regval){
-  ############################
-  # Objective
-    # Learn XGBoost model 
-  # Input 
-    # sampled df: data 
-    # inVarCol: Column index for the input 
-    # labelval: Label
-    # regval: Hyperparameter lambda h
-  # Output 
-    # learnt XGboost model 
-  ############################
 
-  W = sampled_df[,1:D] 
-  X = sampled_df[,(D+1)]  
-  Z = sampled_df[,(D+2)] 
-  Y = sampled_df[,(D+3)]
-  data_sampled = data.frame(W,X,Z,Y)
-  
-  inVar = as.matrix(data_sampled[,inVarCol])
-  # regval = ((max(labelval) - min(labelval))**1)/nrow(data_sampled)
-  model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
-  return(model_XG)
-}
+# learnXG_mediator = function(sampled_df,inVarCol,labelval,regval){
+#   ############################
+#   # Objective
+#     # Learn XGBoost model 
+#   # Input 
+#     # sampled df: data 
+#     # inVarCol: Column index for the input 
+#     # labelval: Label
+#     # regval: Hyperparameter lambda h
+#   # Output 
+#     # learnt XGboost model 
+#   ############################
+# 
+#   W = sampled_df[,1:D] 
+#   X = sampled_df[,(D+1)]  
+#   Z = sampled_df[,(D+2)] 
+#   Y = sampled_df[,(D+3)]
+#   data_sampled = data.frame(W,X,Z,Y)
+#   
+#   inVar = as.matrix(data_sampled[,inVarCol])
+#   # regval = ((max(labelval) - min(labelval))**1)/nrow(data_sampled)
+#   model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
+#   return(model_XG)
+# }
 
 
 learnWdash = function(Wdash1_importance,inVar,regval){
@@ -248,10 +254,19 @@ WERM_Heuristic = function(inVar_train,inVar_eval, Y, Ybinary, lambda_h, learned_
 
 WERMGradient = function(N,inputMat, labelVal, evalMat, lambda_h, lambda_W, iterMax, init_W, LossFun, GradFun){
   xgbMatrix = xgb.DMatrix(data.matrix(data.frame(inputMat)), label=labelVal)
-  modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h,objective = "binary:logistic", weight = learned_W)
+  if (length(unique(labelVal))==2){
+    modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h,objective = "binary:logistic", weight = learned_W)  
+  }else{
+    modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h, weight = learned_W)  
+  }
+  
   pred.Y = predict(modelY_xgboost,newdata=data.matrix(evalMat),type='response')
-  pred.Y = (pred.Y >= 0.5)*1
-  new_pred_loss = sum((pred.Y != labelVal)*1)/N
+  if (length(unique(labelVal))==2){
+    pred.Y = (pred.Y >= 0.5)*1
+    new_pred_loss = sum((pred.Y != labelVal)*1)/N
+  }else{
+    new_pred_loss = sum((pred.Y-labelVal)^2)
+  }
   
   learned_W = init_W
   lossval = LossFun(new_pred_loss,learned_W,init_W,lambda_W)
@@ -280,9 +295,18 @@ WERMGradient = function(N,inputMat, labelVal, evalMat, lambda_h, lambda_W, iterM
       gradval = GradFun(old_pred_loss,learned_W,init_W,lambda_W)
     }
     
-    modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h,objective = "binary:logistic",weight = learned_W)
-    pred.Y = (pred.Y >= 0.5)*1
-    new_pred.loss = sum((pred.Y != labelVal)*1)/N
+    if (length(unique(labelVal))==2){
+      modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h,objective = "binary:logistic", weight = learned_W)  
+    }else{
+      modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h, weight = learned_W)  
+    }
+    
+    if (length(unique(labelVal))==2){
+      pred.Y = (pred.Y >= 0.5)*1
+      new_pred_loss = sum((pred.Y != labelVal)*1)/N
+    }else{
+      new_pred_loss = sum((pred.Y-labelVal)^2)
+    }
     if (abs(old_pred_loss - new_pred_loss) < 0.01){
       break 
     }

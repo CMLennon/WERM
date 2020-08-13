@@ -80,7 +80,12 @@ learnXG = function(inVar,labelval,regval){
     # learnt XGboost model 
   ############################
   # regval = ((max(labelval) - min(labelval))**1)/nrow(data_sampled)
-  model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
+  if (length(unique(labelval)) == 2){
+    model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
+  }else{
+    model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)  
+  }
+  
   return(model_XG)
 }
 

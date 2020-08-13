@@ -248,10 +248,12 @@ WERM_Heuristic = function(inVar_train,inVar_eval, Y, Ybinary, lambda_h, learned_
 
 WERMGradient = function(N,inputMat, labelVal, evalMat, lambda_h, lambda_W, iterMax, init_W, LossFun, GradFun){
   xgbMatrix = xgb.DMatrix(data.matrix(data.frame(inputMat)), label=labelVal)
-  modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h,objective = "binary:logistic", weight = learned_W)
+  modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h, weight = learned_W)
   pred.Y = predict(modelY_xgboost,newdata=data.matrix(evalMat),type='response')
-  pred.Y = (pred.Y >= 0.5)*1
-  new_pred_loss = sum((pred.Y != labelVal)*1)/N
+  # pred.Y = (pred.Y >= 0.5)*1
+  # new_pred_loss = sum((pred.Y != labelVal)*1)/N
+  # pred.Y = (pred.Y >= 0.5)*1
+  new_pred_loss = sum((pred.Y-labelVal)^2)
   
   learned_W = init_W
   lossval = LossFun(new_pred_loss,learned_W,init_W,lambda_W)
@@ -280,9 +282,12 @@ WERMGradient = function(N,inputMat, labelVal, evalMat, lambda_h, lambda_W, iterM
       gradval = GradFun(old_pred_loss,learned_W,init_W,lambda_W)
     }
     
-    modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h,objective = "binary:logistic",weight = learned_W)
-    pred.Y = (pred.Y >= 0.5)*1
-    new_pred.loss = sum((pred.Y != labelVal)*1)/N
+    # modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h,objective = "binary:logistic",weight = learned_W)
+    modelY_xgboost = xgboost(verbose=0, data=xgbMatrix,nrounds = 20,max.depth=20,lambda=lambda_h,alpha=lambda_h,weight = learned_W)
+    pred.Y = predict(modelY_xgboost,newdata=data.matrix(evalMat),type='response')
+    # pred.Y = (pred.Y >= 0.5)*1
+    # new_pred.loss = sum((pred.Y != labelVal)*1)/N
+    new_pred_loss = sum((pred.Y-labelVal)^2)
     if (abs(old_pred_loss - new_pred_loss) < 0.01){
       break 
     }
