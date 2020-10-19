@@ -212,11 +212,13 @@ ComputeSW.lowhigh = function(outVar, inVar, outputname){
   
   Prob.outVar.1 = predict(model_xgboost_margin,newdata=inVar_margin,type='response')
   Prob.outVar.0 = 1 - Prob.outVar.1
-  Prob.outVar = diag(Prob.outVar.1) %*% as.matrix(outVar) + diag(Prob.outVar.0) %*% as.matrix(1-outVar)
+  # Prob.outVar = diag(Prob.outVar.1) %*% as.matrix(outVar) + diag(Prob.outVar.0) %*% as.matrix(1-outVar)
+  Prob.outVar = outVar * Prob.outVar.1 + (1-outVar) * Prob.outVar.0
   
   Prob.outVar.1.giveninVar = predict(model_xgboost,newdata=data.matrix(inVar),type="response")
   Prob.outVar.0.giveninVar = 1-Prob.outVar.1.giveninVar
-  Prob.outVar.inVar = diag(Prob.outVar.1.giveninVar) %*% as.matrix(outVar) + diag(Prob.outVar.0.giveninVar) %*% as.matrix(1-outVar)
+  Prob.outVar.inVar = outVar * Prob.outVar.1.giveninVar + (1-outVar) * Prob.outVar.0.giveninVar
+  # Prob.outVar.inVar = diag(Prob.outVar.1.giveninVar) %*% as.matrix(outVar) + diag(Prob.outVar.0.giveninVar) %*% as.matrix(1-outVar)
   SWXX = Prob.outVar / (Prob.outVar.inVar)
   return(SWXX)
 }

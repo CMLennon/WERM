@@ -43,7 +43,7 @@ dataGen = function(seednum,N,Nintv,D,C){
   fX = function(N,U1,Z){
     Ux = rnorm(N,1,2)
     # X = rbinom(N,size=1,inv.logit(log(abs(1*(U1*Z))+1)* 2*(2*Z-1)*Ux - 4*Ux*exp(U1-2) -3))
-    X = rbinom(N,size=1,inv.logit(1*U1 - 2*Z + Ux   ))
+    X = rbinom(N,size=1,inv.logit(1*U1 - 2*Z + Ux - 3   ))
     return(X)
   }
   fY = function(N,U2,X){

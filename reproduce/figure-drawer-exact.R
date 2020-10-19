@@ -27,7 +27,7 @@ ConstructDFPlot = function(instancename,mean_median){
   df.result.plugin = read.csv(paste(instancename,'-ipw.csv',sep=""))
   # df.result.IPW = read.csv(paste(instancename,'-ipw.csv',sep=""))
   
-  confidence_coef = 1/5
+  confidence_coef = 1
   
   if (mean_median == "median"){
     globalCenter = df.result.summary$Y.heuristic.50
@@ -81,7 +81,8 @@ ConstructDFPlot = function(instancename,mean_median){
 # instancename = 'Result/doubleeffect-0811-0200-D15'
 # instancename = 'Result/doubleeffect-0811-1300-D15'
 # instancename = 'Result/doubleeffect-0813-0400-D2'
-instancename = 'Result/doubleeffect-0813-0400-D5'
+# instancename = 'Result/doubleeffect-0813-0400-D5'
+instancename = 'Result/doubleeffect-0813-2230-D15'
 
 df.result = ConstructDFPlot(instancename,'median')
 # df.result = ConstructDFPlot('Result/mediator-0804-0000-D20','mean')
@@ -89,7 +90,7 @@ df.result = ConstructDFPlot(instancename,'median')
 
 # General 
 regmethod = 'auto'
-ylimits = c(0.0,0.1)
+ylimits = c(0.0,0.5)
 # xlimits = c(0,5000)
 # xlimits = c(15000,max(df.result$Nlist))
 xlimits = c(15000,200000)
