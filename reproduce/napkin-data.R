@@ -16,7 +16,7 @@ dataGen = function(seednum,N,Nintv,D,C){
   c2 = rnorm(D,-2,1)
   cz = rnorm(D,2,1)
   
-  U1 = rnorm(N,-1,varval)
+  U1 = rnorm(N,-8,3*varval)
   U2 = rnorm(N,2,varval)
   U1.intv = rnorm(Nintv,-1,varval)
   U2.intv = rnorm(Nintv,2,varval)
@@ -43,7 +43,7 @@ dataGen = function(seednum,N,Nintv,D,C){
   fX = function(N,U1,Z){
     Ux = rnorm(N,1,2)
     # X = rbinom(N,size=1,inv.logit(log(abs(1*(U1*Z))+1)* 2*(2*Z-1)*Ux - 4*Ux*exp(U1-2) -3))
-    X = rbinom(N,size=1,inv.logit(1*U1 - 2*Z + Ux - 3   ))
+    X = rbinom(N,size=1,inv.logit(1*U1 - 2*Z + Ux - 5  ))
     return(X)
   }
   fY = function(N,U2,X){
