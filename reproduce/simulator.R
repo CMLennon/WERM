@@ -23,6 +23,14 @@ library(tictoc)
 ## nohup Rscript simulator.R 'napkin' 20 2 100 20 1 20 8 50 'napkin-0801-2300-D20' >log-napkin-0801-2300-D20.txt & 
 ## nohup taskset -c 0-15 Rscript simulator.R 'doubleeffect' 15 2 50 20 1 20 15 50 'doubleeffect-0810-2230-D15' >log-doubleeffect-0810-2230-D15.txt & 
 
+## nohup Rscript simulator.R 'napkin' 20 2 100 20 1 20 8 50 'napkin-0801-2300-D20' >log-napkin-0801-2300-D20.txt & 
+## nohup taskset -c 0-15 Rscript simulator.R 'doubleeffect' 15 2 50 20 1 20 15 50 'doubleeffect-0811-0200-D15' >log-doubleeffect-0811-0200-D15.txt & 
+## nohup taskset -c 0-15 Rscript simulator.R 'doubleeffect' 2 2 50 20 1 20 15 5000 'doubleeffect-0813-0400-D2' >log-doubleeffect-0813-0400-D2.txt & 
+## nohup taskset -c 16-30 Rscript simulator.R 'doubleeffect' 5 2 50 20 1 20 15 5000 'doubleeffect-0813-0400-D5' >log-doubleeffect-0813-0400-D5.txt & 
+## nohup taskset -c 0-15 Rscript simulator.R 'doubleeffect' 2 2 25 20 21 40 15 5000 'doubleeffect-0813-1000-D2' >log-doubleeffect-0813-1000-D2.txt & 
+## nohup taskset -c 16-30 Rscript simulator.R 'doubleeffect' 5 2 25 20 21 40 15 5000 'doubleeffect-0813-1300-D5' >log-doubleeffect-0813-1300-D5.txt &
+## nohup taskset -c 0-15 Rscript simulator.R 'doubleeffect' 15 2 50 1 40 15 5000 'doubleeffect-0813-2230-D15' >log-doubleeffect-0813-2230-D15.txt &  
+
 
 args = commandArgs(trailingOnly = TRUE)
 cores = detectCores()
@@ -41,16 +49,16 @@ Nintv = 10^7
 # filetitle = args[10]
 
 # Example
-probleminstance = 'doubleeffect'
-D = 15
-numCate = 2
-simRound = 20
-totalN = 20
-nidx.start = 1
-nidx.end = totalN
-corenum = 4
-NumUnit = 50
-filetitle = paste(probleminstance,'-0810-0000',sep="")
+# probleminstance = 'doubleeffect'
+# D = 15
+# numCate = 2
+# simRound = 20
+# totalN = 20
+# nidx.start = 1
+# nidx.end = totalN
+# corenum = 4
+# NumUnit = 50
+# filetitle = paste(probleminstance,'-0810-0000',sep="")
 
 # probleminstance = 'mediator'
 # D = 5
@@ -67,6 +75,7 @@ filetitle = paste(probleminstance,'-0810-0000',sep="")
 if(probleminstance == 'napkin'){
   source('napkin-data.R')
   source('napkin-as-BD.R')
+  source('napkin-as-IPW.R')
   source('napkin-est-global.R')
   source('napkin-param.R')
   source('napkin-est-heuristic.R')
@@ -127,11 +136,13 @@ mat.naive = matrix(0,nrow=totalN,ncol=6)
 mat.heuristic = matrix(0,nrow=totalN,ncol=6)
 mat.id = matrix(0,nrow=totalN,ncol=6)
 mat.bd = matrix(0,nrow=totalN,ncol=6)
+mat.ipw = matrix(0,nrow=totalN,ncol=6)
 mat.summary.time.global = matrix(0,nrow=totalN,ncol=6)
 mat.summary.time.naive = matrix(0,nrow=totalN,ncol=6)
 mat.summary.time.heuristic = matrix(0,nrow=totalN,ncol=6)
 mat.summary.time.id = matrix(0,nrow=totalN,ncol=6)
 mat.summary.time.bd = matrix(0,nrow=totalN,ncol=6)
+mat.summary.time.ipw = matrix(0,nrow=totalN,ncol=6)
 
 mat.total.intv = matrix(0,nrow=totalN,ncol=simRound)
 mat.total.global = matrix(0,nrow=totalN,ncol=simRound)
@@ -144,6 +155,8 @@ mat.total.id = matrix(0,nrow=totalN,ncol=simRound)
 mat.total.id.time = matrix(0,nrow=totalN,ncol=simRound)
 mat.total.bd = matrix(0,nrow=totalN,ncol=simRound)
 mat.total.bd.time = matrix(0,nrow=totalN,ncol=simRound)
+mat.total.ipw = matrix(0,nrow=totalN,ncol=simRound)
+mat.total.ipw.time = matrix(0,nrow=totalN,ncol=simRound)
 
 for (nidx in nidx.start:nidx.end){
   N = Nlist[nidx]
@@ -190,11 +203,16 @@ for (nidx in nidx.start:nidx.end){
                           BDanswer = c(BDresult[1],BDresult[2],BDresult[3],BDresult[4])
                           BDtime = BDresult[5]
                           
+                          IPWresult = RunFunWithTime(timeoutFun,asIPWEstimator,OBS,D,numCate,timeoutLim)
+                          IPWanswer = c(IPWresult[1],IPWresult[2],IPWresult[3],IPWresult[4])
+                          IPWtime = IPWresult[5]
+                          
                           PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
                           GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
                           HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
                           IDperformance = mean(abs(answer-IDanswer),na.rm=T)
                           BDperformance = mean(abs(answer-BDanswer),na.rm=T)
+                          IPWperformance = mean(abs(answer-IPWanswer),na.rm=T)
                           
                         }else{
                           seednum = sample(1:1000000,1)
@@ -223,16 +241,21 @@ for (nidx in nidx.start:nidx.end){
                           BDanswer = c(BDresult[1],BDresult[2])
                           BDtime = BDresult[3]
                           
+                          IPWresult = RunFunWithTime(timeoutFun,asIPWEstimator,OBS,D,numCate,timeoutLim)
+                          IPWanswer = c(IPWresult[1],IPWresult[2])
+                          IPWtime = IPWresult[3]
+                          
                           PLUGINperformance = mean(abs(answer-PLUGINanswer),na.rm=T)
                           GLOBALperformance = mean(abs(answer-GLOBALanswer),na.rm=T)
                           HEURISTICperformance = mean(abs(answer-HEURISTICanswer),na.rm=T)
                           IDperformance = mean(abs(answer-IDanswer),na.rm=T)
                           BDperformance = mean(abs(answer-BDanswer),na.rm=T)
+                          IPWperformance = mean(abs(answer-IPWanswer),na.rm=T)
                         }
                         answerperformance = 0
                         system(paste("echo 'Progressing:",idx,"%","'"))
                         return(c(answerperformance,PLUGINperformance,GLOBALperformance,HEURISTICperformance,IDperformance,
-                                 PLUGINtime,GLOBALtime,HEURISTICtime,IDtime,BDperformance,BDtime))
+                                 PLUGINtime,GLOBALtime,HEURISTICtime,IDtime,BDperformance,BDtime,IPWperformance,IPWtime))
                       }
   # toc()
   # close(pb)
@@ -248,6 +271,8 @@ for (nidx in nidx.start:nidx.end){
   val.time.id = val.total[,9]
   val.bd = val.total[,10]
   val.time.bd = val.total[,11]
+  val.ipw = val.total[,12]
+  val.time.ipw = val.total[,13]
   
   mat.total.intv[nidx,] = val.intv
   mat.total.naive[nidx,] = val.naive
@@ -260,6 +285,8 @@ for (nidx in nidx.start:nidx.end){
   mat.total.id.time[nidx,] = val.time.id
   mat.total.bd[nidx,] = val.bd
   mat.total.bd.time[nidx,] = val.time.bd
+  mat.total.ipw[nidx,] = val.bd
+  mat.total.ipw.time[nidx,] = val.time.bd
   
   dev.intv = abs((val.intv - val.intv))
   qt.intv = quantile(dev.intv,probs=c(0.05,0.25,0.5,0.75,0.95),na.rm = T)
@@ -291,6 +318,11 @@ for (nidx in nidx.start:nidx.end){
   mean.bd = mean(dev.bd)
   mat.bd[nidx,] = c(as.numeric(qt.bd),mean.bd)
   
+  dev.ipw = abs((val.intv - val.ipw))
+  qt.ipw = quantile(dev.ipw,probs=c(0.05,0.25,0.5,0.75,0.95),na.rm=T)
+  mean.ipw = mean(dev.ipw)
+  mat.ipw[nidx,] = c(as.numeric(qt.ipw),mean.ipw)
+  
   dev.time.naive = val.time.plugin
   qt.time.naive = quantile(dev.time.naive,probs=c(0.05,0.25,0.5,0.75,0.95),na.rm=T)
   mean.time.naive = mean(qt.time.naive)
@@ -315,6 +347,11 @@ for (nidx in nidx.start:nidx.end){
   qt.time.bd = quantile(dev.time.bd,probs=c(0.05,0.25,0.5,0.75,0.95),na.rm=T)
   mean.time.bd = mean(qt.time.bd)
   mat.summary.time.bd[nidx,] = c(as.numeric(qt.time.bd),mean.time.bd)
+  
+  dev.time.ipw = val.time.ipw
+  qt.time.ipw = quantile(dev.time.ipw,probs=c(0.05,0.25,0.5,0.75,0.95),na.rm=T)
+  mean.time.ipw = mean(qt.time.ipw)
+  mat.summary.time.ipw[nidx,] = c(as.numeric(qt.time.ipw),mean.time.ipw)
 }
 
 conflist = c(5,25,50,75,95,'mean')
@@ -326,12 +363,14 @@ for (idx in 1:length(conflist)){
   assign(paste('Y.heuristic.',confval,sep=""),mat.heuristic[,idx])
   assign(paste('Y.id.',confval,sep=""),mat.id[,idx])
   assign(paste('Y.bd.',confval,sep=""),mat.bd[,idx])
+  assign(paste('Y.ipw.',confval,sep=""),mat.ipw[,idx])
   
   assign(paste('Y.time.global.',confval,sep=""),mat.summary.time.global[,idx])
   assign(paste('Y.time.heuristic.',confval,sep=""),mat.summary.time.heuristic[,idx])
   assign(paste('Y.time.id.',confval,sep=""),mat.summary.time.id[,idx])
   assign(paste('Y.time.naive.',confval,sep=""),mat.summary.time.naive[,idx])
   assign(paste('Y.time.bd.',confval,sep=""),mat.summary.time.bd[,idx])
+  assign(paste('Y.time.ipw.',confval,sep=""),mat.summary.time.ipw[,idx])
 }
 
 df.result = data.frame(Nlist, Y.intv.5,Y.intv.25,Y.intv.50,Y.intv.75,Y.intv.95,Y.intv.mean,
@@ -340,12 +379,14 @@ df.result = data.frame(Nlist, Y.intv.5,Y.intv.25,Y.intv.50,Y.intv.75,Y.intv.95,Y
                        Y.heuristic.5,Y.heuristic.25,Y.heuristic.50,Y.heuristic.75,Y.heuristic.95,Y.heuristic.mean, # Heuristic 
                        Y.id.5,Y.id.25,Y.id.50,Y.id.75,Y.id.95,Y.id.mean, # WERM-ID
                        Y.bd.5,Y.bd.25,Y.bd.50,Y.bd.75,Y.bd.95,Y.bd.mean, # BD-ID
+                       Y.ipw.5,Y.ipw.25,Y.ipw.50,Y.ipw.75,Y.ipw.95,Y.ipw.mean, # IPW-ID
                        
                        Y.time.global.5,Y.time.global.25,Y.time.global.50,Y.time.global.75,Y.time.global.95,Y.time.global.mean,
                        Y.time.heuristic.5,Y.time.heuristic.25,Y.time.heuristic.50,Y.time.heuristic.75,Y.time.heuristic.95,Y.time.heuristic.mean,
                        Y.time.id.5,Y.time.id.25,Y.time.id.50,Y.time.id.75,Y.time.id.95,Y.time.id.mean,
                        Y.time.naive.5,Y.time.naive.25,Y.time.naive.50,Y.time.naive.75,Y.time.naive.95,Y.time.naive.mean,
-                       Y.time.bd.5,Y.time.bd.25,Y.time.bd.50,Y.time.bd.75,Y.time.bd.95,Y.time.bd.mean
+                       Y.time.bd.5,Y.time.bd.25,Y.time.bd.50,Y.time.bd.75,Y.time.bd.95,Y.time.bd.mean,
+                       Y.time.ipw.5,Y.time.ipw.25,Y.time.ipw.50,Y.time.ipw.75,Y.time.ipw.95,Y.time.ipw.mean
 )
 write.csv(df.result,paste("Result/",filetitle,"-summary.csv",sep=""))
 write.csv(mat.total.intv,paste("Result/",filetitle,"-intv.csv",sep=""))
@@ -354,12 +395,14 @@ write.csv(mat.total.heuristic,paste("Result/",filetitle,"-heuristic.csv",sep="")
 write.csv(mat.total.global,paste("Result/",filetitle,"-global.csv",sep=""))
 write.csv(mat.total.id,paste("Result/",filetitle,"-id.csv",sep=""))
 write.csv(mat.total.bd,paste("Result/",filetitle,"-bd.csv",sep=""))
+write.csv(mat.total.ipw,paste("Result/",filetitle,"-ipw.csv",sep=""))
 
 write.csv(mat.total.naive.time,paste("Result/",filetitle,"-time-param.csv",sep=""))
 write.csv(mat.total.heuristic.time,paste("Result/",filetitle,"-time-heuristic.csv",sep=""))
 write.csv(mat.total.global.time,paste("Result/",filetitle,"-time-global.csv",sep=""))
 write.csv(mat.total.id.time,paste("Result/",filetitle,"-time-id.csv",sep=""))
 write.csv(mat.total.bd.time,paste("Result/",filetitle,"-time-bd.csv",sep=""))
+write.csv(mat.total.ipw.time,paste("Result/",filetitle,"-time-ipw.csv",sep=""))
 
 # stopCluster(cl)  
 

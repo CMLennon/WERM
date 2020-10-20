@@ -16,10 +16,14 @@ dataGen = function(seednum,N,Nintv,D,C){
   c2 = rnorm(D,-2,1)
   cz = rnorm(D,2,1)
   
-  U1 = rnorm(N,-8,3*varval)
-  U2 = rnorm(N,2,varval)
-  U1.intv = rnorm(Nintv,-1,varval)
-  U2.intv = rnorm(Nintv,2,varval)
+  U1mean = -8; U1Var = 10
+  U1 = rnorm(N,U1mean,U1Var)
+  U1.intv = rnorm(Nintv,U1mean,U1Var)
+  
+  U2mean = 6; U2Var = 8
+  U2 = rnorm(N,U2mean,U2Var)
+  U2.intv = rnorm(Nintv,U2mean,U2Var)
+  
   
   fW = function(N,U1,U2){
     Uw = rnorm(N,0,0.5)
