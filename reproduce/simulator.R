@@ -31,34 +31,37 @@ library(tictoc)
 ## nohup taskset -c 16-30 Rscript simulator.R 'doubleeffect' 5 2 25 20 21 40 15 5000 'doubleeffect-0813-1300-D5' >log-doubleeffect-0813-1300-D5.txt &
 ## nohup taskset -c 0-15 Rscript simulator.R 'doubleeffect' 15 2 50 1 40 15 5000 'doubleeffect-0813-2230-D15' >log-doubleeffect-0813-2230-D15.txt &  
 
+## nohup taskset -c 0-10 Rscript simulator.R 'napkin' 15 25 1000 'napkin-1022-0000-D15' >log-napkin-1022-0000-D15.txt &  
+## nohup taskset -c 11-20 Rscript simulator.R 'doubleeffect' 15 25 1000 'doubleeffect-1022-0000-D15' >log-doubleeffect-1022-0000-D15.txt &  
+
 
 args = commandArgs(trailingOnly = TRUE)
 cores = detectCores()
 timeoutLim = 1000000
 Nintv = 10^7
 
-# probleminstance = args[1]
-# D = as.numeric(args[2]) 
-# numCate = as.numeric(args[3])
-# simRound = as.numeric(args[4])
-# totalN = as.numeric(args[5])
-# nidx.start = as.numeric(args[6])
-# nidx.end = as.numeric(args[7])
-# corenum = as.numeric(args[8])
-# NumUnit = as.numeric(args[9])
-# filetitle = args[10]
+probleminstance = args[1] # napkin
+D = as.numeric(args[2]) # 15
+numCate = 2
+simRound = as.numeric(args[3]) # 10
+totalN = simRound
+nidx.start = 1
+nidx.end = as.numeric(args[4]) # 10
+# corenum = as.numeric(args[8]) #
+NumUnit = as.numeric(args[5])
+filetitle = args[6]
 
 # Example
-# probleminstance = 'doubleeffect'
-# D = 15
+# probleminstance = 'doubleeffect' # napkin
+# D = 5 # 15
 # numCate = 2
-# simRound = 20
-# totalN = 20
+# simRound = 2 # 10
+# totalN = simRound
 # nidx.start = 1
-# nidx.end = totalN
-# corenum = 4
-# NumUnit = 50
-# filetitle = paste(probleminstance,'-0810-0000',sep="")
+# nidx.end = simRound
+# # corenum = as.numeric(args[8]) #
+# NumUnit = 1000
+# filetitle = 'temp'
 
 # probleminstance = 'mediator'
 # D = 5
@@ -128,6 +131,8 @@ print(probleminstance)
 # registerDoSEQ(cl)
 
 C = numCate -1 
+print(totalN)
+print(NumUnit)
 Nlist = c(1:totalN)*NumUnit
 
 mat.intv = matrix(0,nrow=totalN,ncol=6)

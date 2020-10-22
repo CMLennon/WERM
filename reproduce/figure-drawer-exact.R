@@ -82,7 +82,10 @@ ConstructDFPlot = function(instancename,mean_median){
 # instancename = 'Result/doubleeffect-0811-1300-D15'
 # instancename = 'Result/doubleeffect-0813-0400-D2'
 # instancename = 'Result/doubleeffect-0813-0400-D5'
-instancename = 'Result/doubleeffect-0813-2230-D15'
+# instancename = 'Result/doubleeffect-0813-2230-D15'
+# instancename = 'Result/doubleeffect-0813-2230-D15'
+instancename = 'Result/napkin-1020-1550-D15'
+# instancename = 'Result/doubleeffect-1021-1800-D15'
 
 df.result = ConstructDFPlot(instancename,'median')
 # df.result = ConstructDFPlot('Result/mediator-0804-0000-D20','mean')
@@ -90,10 +93,10 @@ df.result = ConstructDFPlot(instancename,'median')
 
 # General 
 regmethod = 'auto'
-ylimits = c(0.0,0.5)
-# xlimits = c(0,5000)
+ylimits = c(0.0,0.1)
+xlimits = c(1000,10000)
 # xlimits = c(15000,max(df.result$Nlist))
-xlimits = c(15000,200000)
+# xlimits = c(15000,200000)
 spanval = 1
 point_size = 3
 alpha_point = 1

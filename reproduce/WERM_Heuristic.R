@@ -117,30 +117,30 @@ learnXG = function(inVar,labelval,regval){
 # }
 
 
-# learnXG_mediator = function(sampled_df,inVarCol,labelval,regval){
-#   ############################
-#   # Objective
-#     # Learn XGBoost model 
-#   # Input 
-#     # sampled df: data 
-#     # inVarCol: Column index for the input 
-#     # labelval: Label
-#     # regval: Hyperparameter lambda h
-#   # Output 
-#     # learnt XGboost model 
-#   ############################
-# 
-#   W = sampled_df[,1:D] 
-#   X = sampled_df[,(D+1)]  
-#   Z = sampled_df[,(D+2)] 
-#   Y = sampled_df[,(D+3)]
-#   data_sampled = data.frame(W,X,Z,Y)
-#   
-#   inVar = as.matrix(data_sampled[,inVarCol])
-#   # regval = ((max(labelval) - min(labelval))**1)/nrow(data_sampled)
-#   model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
-#   return(model_XG)
-# }
+learnXG_mediator = function(sampled_df,inVarCol,labelval,regval){
+  ############################
+  # Objective
+    # Learn XGBoost model
+  # Input
+    # sampled df: data
+    # inVarCol: Column index for the input
+    # labelval: Label
+    # regval: Hyperparameter lambda h
+  # Output
+    # learnt XGboost model
+  ############################
+
+  W = sampled_df[,1:D]
+  X = sampled_df[,(D+1)]
+  Z = sampled_df[,(D+2)]
+  Y = sampled_df[,(D+3)]
+  data_sampled = data.frame(W,X,Z,Y)
+
+  inVar = as.matrix(data_sampled[,inVarCol])
+  # regval = ((max(labelval) - min(labelval))**1)/nrow(data_sampled)
+  model_XG = xgboost(verbose = 0, data = inVar, label = labelval, nrounds = 20,max.depth=10,lambda=regval,alpha=regval/2)
+  return(model_XG)
+}
 
 
 learnWdash = function(Wdash1_importance,inVar,regval){
